@@ -1,5 +1,7 @@
 # Applications of unidimensional IRT using the R package mirt
 
+Maintainer: Cambridge Assessment, Assessment, Research and Development (ARD) <benton.t@cambridgeassessment.org.uk>
+
 Authors: Tom Benton
 
 ## About
