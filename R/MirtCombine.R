@@ -1,6 +1,6 @@
 #' Combine two estimated IRT models into a single object
 #' 
-#' This functions takes two fitted unidimensional IRT models (fitted using mirt or unimirt) 
+#' This function takes two fitted unidimensional IRT models (fitted using mirt or unimirt) 
 #' as an input, and combines them into a single object.
 #' The function assumes that all parameters are calibrated to a common scale
 #' to begin with (e.g. using the function 'MirtStockingLordRecalibrate').
@@ -63,8 +63,7 @@ for(rowid in rowids){if(rowid%in%rowids1){
 }}
 
 nextmirt2v$est=FALSE
-nextmirt2=mirt(alldat,1,pars=nextmirt2v,itemtype=itetypes
-               ,TOL=0.001,technical=list(warn=FALSE))
+nextmirt2=mirt(alldat,1,pars=nextmirt2v,itemtype=itetypes,TOL = NaN)
 return(nextmirt2)
 }
 

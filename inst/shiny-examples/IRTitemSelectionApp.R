@@ -29,6 +29,10 @@ navlistPanel(
            ,splitLayout(numericInput("thetamean","Mean",value=0,step=0.1,min=-3,max=3)
                         ,numericInput("thetasd","SD",value=1,step=0.1,min=0.1,max=3.5))
            ,br(),br()
+           ,"Here is a list of the indices of the items currently included in the test."
+           ,br()
+           ,textOutput("which.items")
+           ,br(),br()
            ,"Can now manually select items to include in test and see impact on score
            distribution and other things. When the app is started, by default,
            all items are included in the constructed test once.
@@ -52,7 +56,13 @@ navlistPanel(
                     ,tableOutput("totalscoredisttable")
                     ,"The table below shows an estimate of the score distribution.
                     The cumulative percent is defined as the percentage of students
-                    expected to be at or above each score."
+                    expected to be at or above each score.
+            Also shown is the expected mean and 
+                 standard deviation of ability at each raw score
+           based on the fitted IRT model. Finally the
+           table shows the ability estimate that corresponds
+           to each total score on the test characteristic curve."
+           
                     ,tableOutput("scoredisttab2")
            )
            ,
@@ -289,6 +299,8 @@ server <- function(input, output,session) {
   output$coefs=renderTable({coefs()},rownames = TRUE)
 
   which.items=reactive({rep(1:nites(),times=itesels())})
+  output$which.items=renderText({which.items()})
+  
   dist1=reactive({
     tempm1=sum(thetas()*qwts())
     tempsd1=sqrt(sum(thetas()*thetas()*qwts())-tempm1^2)
@@ -331,12 +343,18 @@ server <- function(input, output,session) {
   })
   
   output$scoredisttab2<-renderTable({
-    temp1=dist1()[,c("score","prob")]
-    temp1=temp1[order(-temp1$score),]
-    names(temp1)=c("Score","Percent")
-    temp1$Percent=100*temp1$Percent
-    temp1$Cumulative.Percent=cumsum(temp1$Percent)
-    temp1
+    disttable=dist1()
+    TCCstuff=TCClookup(tempmirt1(),which.items = which.items())
+    disttable$TCC_theta=TCCstuff$TCCabil
+    disttable=disttable[order(-disttable$score),]
+    disttable$predicted_percent=100*disttable$prob
+    disttable$predicted_cum_percent=cumsum(disttable$predicted_percent)
+    disttable$expected_theta=disttable$expectedtheta
+    disttable$sd_theta=disttable$sdtheta
+    disttable=disttable[,c("score","predicted_percent"
+                           ,"predicted_cum_percent"
+                           ,"expected_theta","sd_theta","TCC_theta")]
+    disttable
   })
   
   

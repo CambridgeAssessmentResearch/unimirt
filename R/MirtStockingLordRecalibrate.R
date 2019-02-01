@@ -62,8 +62,7 @@ nextmirt2v$value[substr(nextmirt2v$name,1,1)=="d"]=ditems$d-ditems$a*SLpars$B/SL
 nextmirt2v$value[substr(nextmirt2v$name,1,1)=="d" & nextmirt2v$class=="gpcm"]=ditems$d[ditems$class=="gpcm"]-ditems$a[ditems$class=="gpcm"]*ditems$mark[ditems$class=="gpcm"]*SLpars$B
 
 nextmirt2v$est=FALSE
-nextmirt2=mirt(mirtobj2@Data$data,1,pars=nextmirt2v,itemtype=itetypes
-               ,TOL=0.001,technical=list(warn=FALSE))
+nextmirt2=mirt(mirtobj2@Data$data,1,pars=nextmirt2v,itemtype=itetypes,TOL = NaN)
 
 #copy across "fakedata" attribute if there is one
 if("fakedata"%in%names(attributes(mirtobj2))){

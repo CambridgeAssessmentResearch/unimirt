@@ -18,7 +18,7 @@ or by applying the function \link[mirt]{mirt} directly.}
 A estimated "mirt" object.
 }
 \description{
-This functions takes two fitted unidimensional IRT models (fitted using mirt or unimirt) 
+This function takes two fitted unidimensional IRT models (fitted using mirt or unimirt) 
 as an input, and combines them into a single object.
 The function assumes that all parameters are calibrated to a common scale
 to begin with (e.g. using the function 'MirtStockingLordRecalibrate').

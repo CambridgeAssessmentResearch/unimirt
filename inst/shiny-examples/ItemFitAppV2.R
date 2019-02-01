@@ -20,7 +20,7 @@ server <- function(input, output,session) {
     #fs1=fscores(tempmirt1(),method="plausible"
     #            ,use_dentype_estimate = TRUE
     #            )
-    fs1=as.matrix(MirtUniPVs(tempmirt1()))
+    fs1=as.matrix(MirtUniPVs(tempmirt1(),excludefake=FALSE))
     set.seed(as.numeric(Sys.time()))
     fs1})
   anymiss=reactive({sum(is.na(GetDataFromMirt(tempmirt1())))>0})
@@ -60,7 +60,6 @@ server <- function(input, output,session) {
   #Item fit
   output$fittable<-renderTable({fits()},rownames=TRUE)
   #IRT plot
-#  output$plot1<-renderPlot({itemplot(tempmirt1(),input$plotsel)})
   output$plot1<-renderPlot({itemfit(tempmirt1(),empirical.plot=plotselnum(),Theta=thetas())})
   #IRT parameters
   output$plotcoeftable<-renderTable({plotcoef()},rownames=TRUE)
@@ -68,20 +67,33 @@ server <- function(input, output,session) {
   output$plotfittable<-renderTable({plotfits()},rownames=TRUE)
   #Alternative item plots
   plotselnum2=reactive({(1:ncol(tempmirt1()@Data$data))[colnames(tempmirt1()@Data$data)%in%input$plotsel2]})
-  #output$plot2<-renderPlot({itemplot(tempmirt1(),input$plotsel2,type=input$plottype)})
-  output$plot2<-renderPlot({plot(tempmirt1()
+  #output$plot2<-renderPlot({plot(tempmirt1()
+  #                               ,which.items=plotselnum2()
+  #                               ,type=input$plottype
+  #                               ,facet_items=FALSE)})
+  output$plot2<-renderPlot({unimirt.plot(tempmirt1()
                                  ,which.items=plotselnum2()
                                  ,type=input$plottype
-                                 ,facet_items=FALSE)})
+                                ,thetamin=input$thetamin
+                                ,thetamax=input$thetamax)})
   plotcoef2=reactive({coefs()[plotselnum2(),]})
   output$plotcoeftable2<-renderTable({plotcoef2()},rownames=TRUE)
 
   #Empirical ICC plots
   plotselnum3=reactive({(1:ncol(tempmirt1()@Data$data))[colnames(tempmirt1()@Data$data)==input$plotsel3]})
-  output$plot3<-renderPlot({
+  
+  EICC=reactive({
+    tempEICC=list(modelchartdat=NULL)
+    if(anymiss()==FALSE){
+      tempEICC=EmpiricalICCfit(tempmirt1(),plotselnum3(),ngroups=as.numeric(input$ngroups))
+    }
+    tempEICC
+  })
+  
+    output$plot3<-renderPlot({
       tempplot=ggplot()
       if(anymiss()==FALSE){
-        tempplot=EmpiricalICCfit(tempmirt1(),plotselnum3(),ngroups=as.numeric(input$ngroups))$plot1
+        tempplot=EICC()$plot1
       }
       tempplot
       })
@@ -90,6 +102,8 @@ server <- function(input, output,session) {
   plotfits3=reactive({fits()[plotselnum3(),]})
   output$plotfittable3<-renderTable({plotfits3()},rownames=TRUE)
 
+  output$EICCtable=renderTable({EICC()$modelchartdat})
+  
   #Estimated classical parameters (useful if real ones are not available)
   output$estclasstable<-renderTable({MirtToEstimatedClassical(tempmirt1())})
   
@@ -108,15 +122,15 @@ server <- function(input, output,session) {
 
   #Score distribution across all items plot
   #code to app a score dist plot
+  dist1=reactive({ScoreDistFromMirt(tempmirt1())})
   output$totalscoredistplot<-renderPlot({
-      dist1=ScoreDistFromMirt(tempmirt1())
-      ggdist1=ggplot(data=dist1,aes(x=score,y=prob))+
+      ggdist1=ggplot(data=dist1(),aes(x=score,y=prob))+
     #    geom_bar(stat="identity")+labs(x="raw.score",y="proportion")
     geom_line(col="blue",size=1.2)+labs(x="raw.score",y="proportion")
   if(anymiss()==FALSE){
-    empiricaldist=data.frame(score=dist1$score
+    empiricaldist=data.frame(score=dist1()$score
                              ,prob=tabulate(1+rowSums(GetDataFromMirt(tempmirt1()))
-                                            ,nrow(dist1))/nrow(GetDataFromMirt(tempmirt1()))
+                                            ,nrow(dist1()))/nrow(GetDataFromMirt(tempmirt1()))
     )
     #  ggdist1=ggdist1+geom_line(data=empiricaldist,col="blue")
     ggdist1=ggdist1+geom_bar(stat="identity",data=empiricaldist,alpha=0.5)
@@ -124,6 +138,18 @@ server <- function(input, output,session) {
   
   ggdist1
   })
+  output$totalscoredisttable<-renderTable({disttable=dist1()
+  TCCstuff=TCClookup(tempmirt1())
+  disttable$TCC_theta=TCCstuff$TCCabil
+  disttable=disttable[order(-disttable$score),]
+  disttable$predicted_percent=100*disttable$prob
+  disttable$predicted_cum_percent=cumsum(disttable$predicted_percent)
+  disttable$expected_theta=disttable$expectedtheta
+  disttable$sd_theta=disttable$sdtheta
+  disttable=disttable[,c("score","predicted_percent"
+                         ,"predicted_cum_percent"
+                          ,"expected_theta","sd_theta","TCC_theta")]
+    })
   
   #Basic information about inputs and model fit
   output$overallinfo=renderTable({
@@ -241,9 +267,12 @@ ui <- fluidPage(
                  Type 'help(itemplot)' in the console for more information
                  about what the various options mean."
                  ,fluidRow(uiOutput("plotsel2"))
-                 ,selectInput("plottype","Plot type",c("trace","itemscore","infotrace","score","info","infoSE"))
-                  ,
+                 ,selectInput("plottype","Plot type",c("trace","itemscore","infotrace","score","info","SE"))
+                 ,
                  fluidRow(plotOutput("plot2"))
+                 ,
+                 fluidRow(column(6,numericInput("thetamin","Min Ability",-4))
+                          ,column(6,numericInput("thetamax","Max Ability",4)))
                  ,
                  fluidRow("Item parameters")
                  ,tableOutput("plotcoeftable2"))
@@ -278,7 +307,11 @@ ui <- fluidPage(
                  fluidRow("Item parameters"),tableOutput("plotcoeftable3")
                  ,
                  fluidRow("Fit statistics"),tableOutput("plotfittable3")
-                 )
+                 ,
+                 fluidRow("The theoretical relationship between total test score 
+                          and item score is reproduced in tabular form below.")
+                  ,tableOutput("EICCtable")
+        )
         ,
         tabPanel("Estimated classical statistics",
                  "The table below attempts to re-estimate equivalents
@@ -351,7 +384,16 @@ ui <- fluidPage(
                   will also be shown allowing a comparison with the actual
                   score distribution.")
                  ,br(),br()
-                 ,fluidRow(plotOutput("totalscoredistplot")))
+                 ,fluidRow(plotOutput("totalscoredistplot"))
+                 ,br(),br()
+                 ,"The table below shows the predicted percentage of students at
+                 each score. based on the model. It is sorted from the highest scores to the lowest.
+                  Also shown is the expected mean and 
+                 standard deviation of ability at each raw score
+                 based on the fitted IRT model. Finally the
+                 table shows the ability estimate that corresponds
+                 to each total score on the test characteristic curve."
+                 ,fluidRow(tableOutput("totalscoredisttable")))
     ,widths=c(3,9))
 )
 

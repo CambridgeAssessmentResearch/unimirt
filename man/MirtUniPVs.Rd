@@ -4,11 +4,14 @@
 \alias{MirtUniPVs}
 \title{Function to create plausible values from a mirt object}
 \usage{
-MirtUniPVs(mirtobj)
+MirtUniPVs(mirtobj, excludefake = TRUE)
 }
 \arguments{
 \item{mirtobj}{An estimated IRT model (of class SingleGroupClass) estimated either using the function "unimirt"
 or by applying the function "mirt" directly.}
+
+\item{excludefake}{A logical value dnoting whether any added "fake" cases should be excluded
+from the returned ability estimates (default=TRUE).}
 }
 \value{
 A vector of plausible ability values. The number of plausible values is always equal to the number of 

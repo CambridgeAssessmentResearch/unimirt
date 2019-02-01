@@ -15,7 +15,7 @@ extractGroup(multgroupobj, group)
 This is function is essentially a wrapper for the function \link[mirt]{extract.group} from the mirt package but
 ensures that extracted object retains a few pieces of information that are need by most of the interactive apps.
 It may be useful when IRT models have been fitted using multiple group methods
-(perhaps to help impose various contraints on parameters across groups)
+(perhaps to help impose various constraints on parameters across groups)
 but we wish to be able to interactively view the results within particular groups.
 }
 \examples{

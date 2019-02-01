@@ -36,6 +36,8 @@ MirtLogLikMatrix=function(mirtobj){
 #' 
 #' @param mirtobj An estimated IRT model (of class SingleGroupClass) estimated either using the function "unimirt"
 #' or by applying the function "mirt" directly.
+#' @param excludefake A logical value dnoting whether any added "fake" cases should be excluded
+#' from the returned ability estimates (default=TRUE).
 #' 
 #' @return A vector of plausible ability values. The number of plausible values is always equal to the number of 
 #' cases used to fit the IRT model in the first place.
@@ -46,13 +48,58 @@ MirtLogLikMatrix=function(mirtobj){
 #' MirtUniPVs(mirt1)
 #' }
 #' @export
-MirtUniPVs=function(mirtobj){
+MirtUniPVs=function(mirtobj,excludefake=TRUE){
   LogLik1=MirtLogLikMatrix(mirtobj)
   pvs=sapply(1:nrow(LogLik1$Posterior)
              ,function(i) sample(mirtobj@Model$Theta,1,prob=LogLik1$Posterior[i,]))
   #add a little uniform error around the PVs so they're not all on top of each other
   plusminus=mean(stats::filter(mirtobj@Model$Theta,c(1,-1)),na.rm=TRUE)/2
   pvs=pvs+stats::runif(length(pvs),-plusminus,+plusminus)
-  return(pvs)
+
+#if no "fake" data then just return these values
+  if(!"fakedata"%in%names(attributes(mirtobj))){return(pvs)}
+#if excludefake is FALSE then just return these vakues
+  if(excludefake==FALSE){return(pvs)}
+
+#otherwise remove fake data
+pvs=pvs[attr(mirtobj,"fakedata")==FALSE]
+return(pvs)
+}
+
+#' Function to extract EAP ability estimates from a mirt object
+#' 
+#' A wrapper for the "fscores" function from the package "mirt".
+#' However, by default, this function will ensure any fake data added by the 
+#' link{augmentdata} function as a pre-cursor to model fitting is excluded.
+#' Furthermore, this function automatically includes standard errors for each
+#' estimate and returns the ability estimates and standard errors in a data frame.
+#' 
+#' @param mirtobj An estimated unidimensional IRT model (of class SingleGroupClass) estimated either using the function "unimirt"
+#' or by applying the function "mirt" directly.
+#' @param excludefake A logical value dnoting whether any added "fake" cases should be excluded
+#' from the returned ability estimates (default=TRUE).
+#' 
+#' @return A data frame with column labels "eap" and "se.eap".
+#'
+#' @seealso \code{\link[mirt]{fscores}}
+#' @examples
+#' \dontrun{
+#' mirt1=unimirt(mathsdata,"2")
+#' MirtEAPs(mirt1)
+#' }
+#' @export
+MirtEAPs=function(mirtobj,excludefake=TRUE){
+
+eaps=data.frame(mirt::fscores(mirtobj,full.scores.SE=TRUE))[,c("F1","SE_F1")]
+names(eaps)=c("eap","se.eap")
+
+#if no "fake" data then just return these values
+  if(!"fakedata"%in%names(attributes(mirtobj))){return(eaps)}
+#if excludefake is FALSE then just return these vakues
+  if(excludefake==FALSE){return(eaps)}
+
+#otherwise remove fake data
+eaps=eaps[attr(mirtobj,"fakedata")==FALSE,]
+return(eaps)
 }
 
