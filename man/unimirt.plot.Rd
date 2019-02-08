@@ -15,7 +15,7 @@ curves for each item, "itemscore" produces item characteristic curves for each i
 (based on selected items), "SE" produces an idea of the precision of ability estimates based on the selected items,
 and "score" gives the test characteristic curve (based on the selected items).}
 
-\item{which.items}{an integer vector indicating which items to include in the expected test score. By deafult all items are included.}
+\item{which.items}{an integer vector indicating which items to include. By default all items are included.}
 
 \item{thetamin}{The minimum ability to include in plots. By default this is extracted from the mirtobj object.}
 

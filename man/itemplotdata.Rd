@@ -9,7 +9,7 @@ itemplotdata(mirtobj, which.items = NULL, Theta = NULL)
 \arguments{
 \item{mirtobj}{An estimated IRT model (of class SingleGroupClass) estimated either using \link[mirt]{mirt} or \link[unimirt]{unimirt}.}
 
-\item{which.items}{an integer vector indicating which items to include in the expected test score. By deafult all items are included.}
+\item{which.items}{an integer vector indicating which items to include. By default all items are included.}
 
 \item{Theta}{a vector of ability values where calculations should focus. By default this is extracted from mirtobj.}
 }

@@ -1,6 +1,6 @@
 #Global statements
 library(shiny)
-library(mirt)
+library(unimirt)
 library(ggplot2)
 library(reshape2)
 globls=ls(name=".GlobalEnv")
@@ -118,7 +118,7 @@ server <- function(input, output,session) {
       geom_area(data=data.frame(Ability=dens1$x,density=dens1$y),alpha=0.5)
   })
   #Ability parameters
-  output$abilpars<-renderTable({coef(tempmirt1())$GroupPars})
+  output$abilpars<-renderTable({data.frame(coef(tempmirt1())$GroupPars)[1,]})
 
   #Score distribution across all items plot
   #code to app a score dist plot
@@ -202,6 +202,9 @@ server <- function(input, output,session) {
     coefs()[coefs()$Item%in%SelItems,]
   })
   
+  #Item slopes plot
+  
+  output$SlopePlot<-renderPlot({SlopePlot(tempmirt1())})
   #overallinfo,itemtypesinfo,itemmaxesinfo
 
  session$onSessionEnded(function() {
@@ -394,6 +397,21 @@ ui <- fluidPage(
                  table shows the ability estimate that corresponds
                  to each total score on the test characteristic curve."
                  ,fluidRow(tableOutput("totalscoredisttable")))
+      ,tabPanel("Comparing item slopes"
+                ,fluidRow("The plot below displays
+                          the slope parameters for all items.
+                          The dotted line gives the median slope
+                          parameter across all items.
+                          If the model was fitted using the
+                          generalised partail credit model (gpcm)
+                          then this chart may reveal if items
+                          are potentially being under or over rewarded.
+                          If the IRT models were estimated with
+                          'SE=TRUE' then 95 per cent confidence 
+                          intervals for the slope parameters will also
+                          be displayed.")
+                ,br(),br()
+                ,fluidRow(plotOutput("SlopePlot",height="1500px")))
     ,widths=c(3,9))
 )
 

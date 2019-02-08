@@ -3,9 +3,8 @@
 #' For unidimensional IRT models this function creates
 #' a full set of the data that would be used in item information plots, item characteristic curves, and item category probability curves.
 #' 
-#' 
 #' @param mirtobj An estimated IRT model (of class SingleGroupClass) estimated either using \link[mirt]{mirt} or \link[unimirt]{unimirt}.
-#' @param which.items an integer vector indicating which items to include in the expected test score. By deafult all items are included.
+#' @param which.items an integer vector indicating which items to include. By default all items are included.
 #' @param Theta a vector of ability values where calculations should focus. By default this is extracted from mirtobj.
 #' 
 #' @return A list of data frames covering the required information at item level, test level and for individual item categories.
@@ -90,7 +89,7 @@ return(list(itemdata=itemdata,testdata=testdata,tracedata=tracedata))
 #' curves for each item, "itemscore" produces item characteristic curves for each item, "info" produces total test information
 #' (based on selected items), "SE" produces an idea of the precision of ability estimates based on the selected items,
 #' and "score" gives the test characteristic curve (based on the selected items).
-#' @param which.items an integer vector indicating which items to include in the expected test score. By deafult all items are included.
+#' @param which.items an integer vector indicating which items to include. By default all items are included.
 #' @param thetamin The minimum ability to include in plots. By default this is extracted from the mirtobj object.
 #' @param thetamax The maximum ability to include in plots. By default this is extracted from the mirtobj object.
 #' 
