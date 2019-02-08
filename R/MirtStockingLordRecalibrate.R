@@ -4,9 +4,10 @@
 #' as an input, and finds the Stocking-Lord transformation (based on common items) from one ability scale to the other.
 #' Finally it recalibrates the second object to produce a new "mirt" object calibrated to the desired ability scale.
 #' This function uses the item names within each fitted object to identify common items automatically.
+#' At present, this function will only work correctly with the itemtypes implemented within \link[unimirt]{unimirt}.
 #' 
-#' @param mirtobj1 An estimated IRT model (of class SingleGroupClass) estimated either using \link[mirt]{mirt} or \link[unimirt]{unimirt}. This object defines the ability scale that everything is being transformed
-#' to.
+#' @param mirtobj1 An estimated IRT model (of class SingleGroupClass) estimated either using \link[mirt]{mirt} or \link[unimirt]{unimirt}.
+#' This object defines the ability scale that everything is being transformed to.
 #' @param mirtobj2 An estimated IRT model (of class SingleGroupClass) estimated either using \link[mirt]{mirt} or \link[unimirt]{unimirt}. This object is the one that will be re-created on the revised ability scale.
 #' @param fixSLA Logical value denoting that the Stocking-Lord slope should be fixed at 1. 
 #' By default this parameter is FALSE but will be set to TRUE if any items of itemtype "Rasch" are 
@@ -42,8 +43,8 @@ nextmirt2v=mirt(mirtobj2@Data$data,1,pars="values",itemtype=itetypes)
 nextmirt2v$value=pars2$value#start with existing estimates
 nextmirt2v$value[nextmirt2v$name=="MEAN_1"]=nextmirt2v$value[nextmirt2v$name=="MEAN_1"]*SLpars$A+SLpars$B
 nextmirt2v$value[nextmirt2v$name=="COV_11"]=nextmirt2v$value[nextmirt2v$name=="COV_11"]*(SLpars$A^2)
-#can easily adjust slopes
-nextmirt2v$value[substr(nextmirt2v$name,1,1)=="a"]=nextmirt2v$value[substr(nextmirt2v$name,1,1)=="a"]/SLpars$A
+#can easily adjust slopes (DON'T ADJUST "ak" PARAMETER!)
+nextmirt2v$value[nextmirt2v$name%in%c("a","a1")]=nextmirt2v$value[nextmirt2v$name%in%c("a","a1")]/SLpars$A
 #adjusting intercepts is complicated
 ditems=data.frame(item=nextmirt2v$item[substr(nextmirt2v$name,1,1)=="d"]
                   ,d=nextmirt2v$value[substr(nextmirt2v$name,1,1)=="d"]
@@ -59,7 +60,8 @@ ditems=merge(ditems,aitems,sort=FALSE)
 #usual adjustment
 nextmirt2v$value[substr(nextmirt2v$name,1,1)=="d"]=ditems$d-ditems$a*SLpars$B/SLpars$A
 #adjustment for pcm and gpcm items
-nextmirt2v$value[substr(nextmirt2v$name,1,1)=="d" & nextmirt2v$class=="gpcm"]=ditems$d[ditems$class=="gpcm"]-ditems$a[ditems$class=="gpcm"]*ditems$mark[ditems$class=="gpcm"]*SLpars$B
+nextmirt2v$value[substr(nextmirt2v$name,1,1)=="d" & nextmirt2v$class=="gpcm"]=ditems$d[ditems$class=="gpcm"]-ditems$a[ditems$class=="gpcm"]*ditems$mark[ditems$class=="gpcm"]*SLpars$B/SLpars$A
+
 
 nextmirt2v$est=FALSE
 nextmirt2=mirt(mirtobj2@Data$data,1,pars=nextmirt2v,itemtype=itetypes,TOL = NaN)

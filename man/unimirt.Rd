@@ -13,7 +13,10 @@ unimirt(data, short.type = "2", augment.data = TRUE, ...)
 means that a two-parameter graded response IRT model will be used for al items. "1" also leads to a graded response
 model but with the restriction that all items are constrained to have the same slope.
 "3" will lead to a 3-parameter IRT model being fitted to all dichotmous items and a graded response model
-to all polytomous items. "Rasch" will fit a Rasch/Partial Credit Model to all items.}
+to all polytomous items. "Rasch" will fit a Rasch/Partial Credit Model to all items. "gpcm" will fit the
+generalised partial credit model to all items. Finally "gpcmfixed" will fit generalised partial credit model
+but constrain all slope parameters to be equal. This is equivalent to fitting a Rasch model with the constraint being on
+the variance of the ability distribution rather than fixing all slope parameters to have a value of 1.}
 
 \item{augment.data}{Should missing categories in items be handled by adding cases to the data (default TRUE). Provided
 the overall data set is reasonably large this should have minimal impact on estimated item parameters.}
@@ -45,6 +48,16 @@ MirtTidyCoef(mirt3)
 mirtRasch=unimirt(mathsdata,"Rasch")
 coef(mirtRasch)
 MirtTidyCoef(mirtRasch)
+
+#gpcm
+mirtgpcm=unimirt(mathsdata,"gpcm")
+coef(mirtgpcm)
+MirtTidyCoef(mirtgpcm)
+
+#gpcmfixed
+mirtgpcmfixed=unimirt(mathsdata,"gpcmfixed")
+coef(mirtgpcmfixed)
+MirtTidyCoef(mirtgpcmfixed)
 
 }
 }

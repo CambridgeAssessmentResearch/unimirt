@@ -7,8 +7,8 @@
 MirtObjectRecalibrate(mirtobj1, mirtobj2, fixSLA = FALSE)
 }
 \arguments{
-\item{mirtobj1}{An estimated IRT model (of class SingleGroupClass) estimated either using \link[mirt]{mirt} or \link[unimirt]{unimirt}. This object defines the ability scale that everything is being transformed
-to.}
+\item{mirtobj1}{An estimated IRT model (of class SingleGroupClass) estimated either using \link[mirt]{mirt} or \link[unimirt]{unimirt}.
+This object defines the ability scale that everything is being transformed to.}
 
 \item{mirtobj2}{An estimated IRT model (of class SingleGroupClass) estimated either using \link[mirt]{mirt} or \link[unimirt]{unimirt}. This object is the one that will be re-created on the revised ability scale.}
 
@@ -24,6 +24,7 @@ This functions takes two fitted unidimensional IRT models (fitted using mirt)
 as an input, and finds the Stocking-Lord transformation (based on common items) from one ability scale to the other.
 Finally it recalibrates the second object to produce a new "mirt" object calibrated to the desired ability scale.
 This function uses the item names within each fitted object to identify common items automatically.
+At present, this function will only work correctly with the itemtypes implemented within \link[unimirt]{unimirt}.
 }
 \examples{
 \dontrun{
