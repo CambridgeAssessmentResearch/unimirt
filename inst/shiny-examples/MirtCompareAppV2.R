@@ -29,7 +29,10 @@ server <- function(input, output,session) {
 
   output$eplot<-renderPlot({ExpectedScoreCompare(tempmirt1(),tempmirt2(),lab1=input$sel1,lab2=input$sel2)})
   output$iteplot<-renderPlot({ItemParameterCompare(tempmirt1(),tempmirt2(),compare=input$comparesel)})
-
+  output$iteplot2<-renderPlot({
+	ParComparePlot(list(tempmirt1(),tempmirt2()),c(input$sel1,input$sel2),compare=input$comparesel2)
+	})
+  
 #code to close app
  session$onSessionEnded(function() {
    stopApp()
@@ -40,7 +43,7 @@ server <- function(input, output,session) {
 ###ACTUAL OUTPUT
 ui <- fluidPage(
   # Application title
-  titlePanel("Comparing IRT objects"),
+  titlePanel("Comparing IRT objects of the same type"),
   selectInput("sel1", "Select first IRT object",loadofmirts),
   selectInput("sel2", "Select second IRT object",loadofmirts),
   navlistPanel(
@@ -85,7 +88,22 @@ ui <- fluidPage(
                   ,br(),br()
                 ,fluidRow(plotOutput("eplot"))
 		))
-)
+	,
+	tabPanel("Parameter comparisons",column(11
+	                                       ,"The plot below
+	                                       provides another method to compare
+	                                       parameters values across models.
+	                                       If these have been estimated with 
+	                                       'SE=TRUE' then the chart includes
+	                                       95 per cent confidence intervals
+	                                       for the selected parameters."
+	                                       ,br(),br(),
+	                                       fluidRow(selectInput("comparesel2","Which item parameters do you want to compare?"
+	                                                            ,c("Difficulties","Slopes","Guessing")))
+	                                       ,br(),br()
+	                                       ,fluidRow(plotOutput("iteplot2"))
+	))
+  )
 )
 
 # Run the application 

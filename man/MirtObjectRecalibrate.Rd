@@ -4,7 +4,7 @@
 \alias{MirtObjectRecalibrate}
 \title{Use the Stocking-Lord procedure to recalibrate ome mirt object to ability scale of another}
 \usage{
-MirtObjectRecalibrate(mirtobj1, mirtobj2, fixSLA = FALSE)
+MirtObjectRecalibrate(mirtobj1, mirtobj2, fixSLA = FALSE, SE = FALSE)
 }
 \arguments{
 \item{mirtobj1}{An estimated IRT model (of class SingleGroupClass) estimated either using \link[mirt]{mirt} or \link[unimirt]{unimirt}.
@@ -15,6 +15,10 @@ This object defines the ability scale that everything is being transformed to.}
 \item{fixSLA}{Logical value denoting that the Stocking-Lord slope should be fixed at 1. 
 By default this parameter is FALSE but will be set to TRUE if any items of itemtype "Rasch" are 
 detected in the data sets.}
+
+\item{SE}{Logical value denoting whether SEs should be re-estimated on the new scale.
+By default this parameter is FALSE meaning that SEs will not be available
+in the rescaled object.}
 }
 \value{
 A estimated "mirt" object that can be used as a replacement for mirtobj2 but on the desired abiltiy scale.

@@ -44,7 +44,8 @@ for(rowid in rowids){if(rowid%in%rowids1){
   nextmirt2v$value[rowids==rowid]=pars1$value[rowids1==rowid]
 }}
 
-nextmirt2v$est=FALSE
+#nextmirt2v$est=FALSE
 nextmirt2=mirt(dat1,1,pars=nextmirt2v,itemtype=itetypes,TOL = NaN)
+
 return(nextmirt2)
 }

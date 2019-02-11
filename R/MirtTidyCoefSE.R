@@ -39,5 +39,28 @@ colord=order(names(allcoef))
 allcoef=allcoef[,colord]
 #remove dummy starter row
 allcoef=allcoef[-1,]
+
+#if we have both "b1" and "b" amongst the parameters then use b1
+if(("b1"%in%names(allcoef)) & ("b"%in%names(allcoef))){
+bcol=(1:ncol(allcoef))[names(allcoef)=="b"]
+allcoef$b1[is.na(allcoef$b1)]=allcoef$b[is.na(allcoef$b1)]
+allcoef=allcoef[,-bcol]
+if("b1.SE"%in%names(allcoef)){
+	allcoef$b1.SE[is.na(allcoef$b1.SE)]=allcoef$b.SE[is.na(allcoef$b1.SE)]
+	bSEcol=(1:ncol(allcoef))[names(allcoef)=="b.SE"]
+	allcoef=allcoef[,-bSEcol]
+	}
+}
+
+#if "b" but not "b1" amongst the parameters then rename to "b1"
+if(!("b1"%in%names(allcoef)) & ("b"%in%names(allcoef))){
+bcol=(1:ncol(allcoef))[names(allcoef)=="b"]
+names(allcoef)[bcol]="b1"
+if("b.SE"%in%names(allcoef)){
+	bSEcol=(1:ncol(allcoef))[names(allcoef)=="b.SE"]
+	names(allcoef)[bSEcol]="b1.SE"
+	}
+}
+
 return(allcoef)
 }

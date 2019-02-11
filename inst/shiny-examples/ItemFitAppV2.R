@@ -204,9 +204,21 @@ server <- function(input, output,session) {
   
   #Item slopes plot
   
-  output$SlopePlot<-renderPlot({SlopePlot(tempmirt1())})
+  output$ParPlot<-renderPlot({
+    if(input$parametertype=="Slopes"){plot1=SlopePlot(tempmirt1())}
+    if(input$parametertype=="Difficulties"){plot1=DifficultyPlot(tempmirt1())}
+    plot1
+  })
   #overallinfo,itemtypesinfo,itemmaxesinfo
-
+  output$ParTable=renderTable({
+    tab1=tryCatch(MirtTidyCoefSE(tempmirt1())
+             ,error = function(e) MirtTidyCoef(tempmirt1()))
+    if(!"Item"%in%names(tab1)){tab1$Item=rownames(tab1)}
+    othcols=names(tab1)[!names(tab1)=="Item"]
+    tab1=tab1[,c("Item",othcols)]
+    tab1
+  })
+  
  session$onSessionEnded(function() {
    stopApp()
  })
@@ -220,7 +232,7 @@ ui <- fluidPage(
   selectInput("sel1", "Select an IRT object",loadofmirts),
   navlistPanel(
     tabPanel("Basic Information",
-             "Information about the numbers of person and items 
+             "Information about the numbers of persons and items 
              included in analysis is below alongside measures of model fit.
              The number of items with each maximum number of marks
              and with each estimated item type is also displayed."
@@ -397,22 +409,25 @@ ui <- fluidPage(
                  table shows the ability estimate that corresponds
                  to each total score on the test characteristic curve."
                  ,fluidRow(tableOutput("totalscoredisttable")))
-      ,tabPanel("Comparing item slopes"
+      ,tabPanel("Comparing item parameters"
+                ,fluidRow(selectInput("parametertype","Parameters to include in chart",c("Difficulties","Slopes")))
                 ,fluidRow("The plot below displays
-                          the slope parameters for all items.
-                          The dotted line gives the median slope
-                          parameter across all items.
-                          If the model was fitted using the
-                          generalised partail credit model (gpcm)
-                          then this chart may reveal if items
-                          are potentially being under or over rewarded.
+                          the selected item parameters for all items.
+                          The dotted line gives the median 
+                          parameter value across all items.
                           If the IRT models were estimated with
                           'SE=TRUE' then 95 per cent confidence 
                           intervals for the slope parameters will also
-                          be displayed.")
+                          be displayed.
+                          If the model was fitted using the
+                          generalised partail credit model (gpcm)
+                          then looking at slope parameters may reveal if items
+                          are potentially being under or over rewarded.
+                          ")
                 ,br(),br()
-                ,fluidRow(plotOutput("SlopePlot",height="1500px")))
-    ,widths=c(3,9))
+                ,fluidRow(plotOutput("ParPlot",height="1500px"))
+                ,fluidRow(tableOutput("ParTable")))
+  ,widths=c(3,9))
 )
 
 # Run the application 

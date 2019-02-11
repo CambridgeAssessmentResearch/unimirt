@@ -12,6 +12,9 @@
 #' @param fixSLA Logical value denoting that the Stocking-Lord slope should be fixed at 1. 
 #' By default this parameter is FALSE but will be set to TRUE if any items of itemtype "Rasch" are 
 #' detected in the data sets.
+#' @param SE Logical value denoting whether SEs should be re-estimated on the new scale.
+#' By default this parameter is FALSE meaning that SEs will not be available
+#' in the rescaled object.
 #' 
 #' @return A estimated "mirt" object that can be used as a replacement for mirtobj2 but on the desired abiltiy scale.
 #' 
@@ -25,7 +28,7 @@
 #' ExpectedScoreCompare(mirt1,mirt2.rescale)
 #' }
 #' @export
-MirtObjectRecalibrate=function(mirtobj1,mirtobj2,fixSLA=FALSE){
+MirtObjectRecalibrate=function(mirtobj1,mirtobj2,fixSLA=FALSE,SE=FALSE){
 
 itetypes=extract.mirt(mirtobj2,"itemtype")
 israsch=(max(itetypes%in%"Rasch")==1)#check whether we are recalibrating Rasch items
@@ -63,8 +66,8 @@ nextmirt2v$value[substr(nextmirt2v$name,1,1)=="d"]=ditems$d-ditems$a*SLpars$B/SL
 nextmirt2v$value[substr(nextmirt2v$name,1,1)=="d" & nextmirt2v$class=="gpcm"]=ditems$d[ditems$class=="gpcm"]-ditems$a[ditems$class=="gpcm"]*ditems$mark[ditems$class=="gpcm"]*SLpars$B/SLpars$A
 
 
-nextmirt2v$est=FALSE
-nextmirt2=mirt(mirtobj2@Data$data,1,pars=nextmirt2v,itemtype=itetypes,TOL = NaN)
+#nextmirt2v$est=FALSE
+nextmirt2=mirt(mirtobj2@Data$data,1,pars=nextmirt2v,itemtype=itetypes,TOL = NaN,SE=SE)
 
 #copy across "fakedata" attribute if there is one
 if("fakedata"%in%names(attributes(mirtobj2))){
