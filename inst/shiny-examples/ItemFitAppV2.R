@@ -45,9 +45,11 @@ server <- function(input, output,session) {
                 ,multiple=TRUE
                 )
   })
-  
   output$plotsel3 <- renderUI({
     selectInput("plotsel3","Choose item",colnames(tempmirt1()@Data$data))
+  })
+  output$plotsel4 <- renderUI({
+    selectInput("plotsel4","Choose item",colnames(tempmirt1()@Data$data))
   })
   
   
@@ -151,6 +153,20 @@ server <- function(input, output,session) {
                           ,"expected_theta","sd_theta","TCC_theta")]
     })
   
+  #Item score distributions
+  plotselnum4=reactive({(1:ncol(tempmirt1()@Data$data))[colnames(tempmirt1()@Data$data)==input$plotsel4]})
+  idisttab=reactive({EstimatedItemDistribution(tempmirt1(),plotselnum4())})
+  output$idisttab<-renderTable({idisttab()})
+  output$idistplot<-renderPlot({
+    idisttab2=reshape2::melt(idisttab(),id.vars=c("Item","Score")
+                                                         ,variable.name="Type",value.name="Per_cent")
+    ggplot(data=idisttab2,aes(x=as.factor(Score),y=Per_cent,fill=Type))+
+      geom_bar(stat="identity",position="dodge")+
+  	  labs(x="Item Score",Y="Per cent")+
+  	  scale_y_continuous(limits=c(0,100),breaks=seq(0,100,10))+
+  	  theme_minimal()+theme(text=element_text(size=14))
+  })
+
   #Basic information about inputs and model fit
   output$overallinfo=renderTable({
     data.frame(N.persons=tempmirt1()@Data$N
@@ -409,6 +425,16 @@ ui <- fluidPage(
                  table shows the ability estimate that corresponds
                  to each total score on the test characteristic curve."
                  ,fluidRow(tableOutput("totalscoredisttable")))
+        ,
+        tabPanel("Item score distributions"
+                 ,fluidRow(uiOutput("plotsel4"))
+                 ,"The chart and table show the expected score distribution for the selected item based upon the fitted model.
+                 If the selected item was taken by everyone in the data set (no missing data) then the actual score distribution is also
+                 shown."
+                 ,br(),br()
+                 ,fluidRow(plotOutput("idistplot"))
+                 ,tableOutput("idisttab")
+                 )
       ,tabPanel("Comparing item parameters"
                 ,fluidRow(selectInput("parametertype","Parameters to include in chart",c("Difficulties","Slopes")))
                 ,fluidRow("The plot below displays

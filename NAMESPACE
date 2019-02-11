@@ -3,6 +3,7 @@
 export(ChooseItems)
 export(DifficultyPlot)
 export(EmpiricalICCfit)
+export(EstimatedItemDistribution)
 export(ExpectedScoreCompare)
 export(FindBestRabils)
 export(GetDataFromMirt)

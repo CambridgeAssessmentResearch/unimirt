@@ -14,7 +14,7 @@ MirtToEstimatedClassical(mirtobj, theta = NULL, qwts = NULL)
 \item{qwts}{A vector giving the weight to assign to each ability in thetas. By default this is extracted directly from mirtobj.}
 }
 \description{
-This function estimates classical itme statistics from the fitted IRT model estimated using "mirt".
+This function estimates classical item statistics from the fitted IRT model estimated using "mirt".
 This is useful as it will produce these estimates even if different students have taken different items.
 }
 \examples{

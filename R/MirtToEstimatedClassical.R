@@ -1,6 +1,6 @@
 #' Estimate classical item statistics for data in a "mirt" object.
 #' 
-#' This function estimates classical itme statistics from the fitted IRT model estimated using "mirt".
+#' This function estimates classical item statistics from the fitted IRT model estimated using "mirt".
 #' This is useful as it will produce these estimates even if different students have taken different items.
 #' 
 #' @param mirtobj An estimated IRT model (of class SingleGroupClass) estimated either using \link[mirt]{mirt} or \link[unimirt]{unimirt}.
