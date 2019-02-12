@@ -45,7 +45,7 @@ for(rowid in rowids){if(rowid%in%rowids1){
 }}
 
 #nextmirt2v$est=FALSE
-nextmirt2=mirt(dat1,1,pars=nextmirt2v,itemtype=itetypes,TOL = NaN)
+nextmirt2=mirt(dat1,1,pars=nextmirt2v,itemtype=itetypes,TOL = NaN,technical=list(removeEmptyRows=TRUE))
 
 return(nextmirt2)
 }
