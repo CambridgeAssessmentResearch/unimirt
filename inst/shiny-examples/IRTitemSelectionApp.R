@@ -233,11 +233,13 @@ server <- function(input, output,session) {
   output$constr=renderTable({data.frame(a=constrvars(),b=constrmins(),c=constrmaxs())})
     
     observeEvent(input$startopt, {
-      revals$optsel=tryCatch(ChooseItems(idata1a(),"auc"
+      withProgress(message = 'Selecting Items',value=0,{
+		revals$optsel=tryCatch(ChooseItems(idata1a(),"auc"
                                 ,constrvars()
                                 ,constrmins()
                                 ,constrmaxs())
                     ,error=function(e) NULL)
+			})
     
       for (iz in 1:nites()){
         updateNumericInput(session, paste0("item_num",iz),  value = 0)
