@@ -34,7 +34,7 @@ names(dat1)=colnames(mirtobj@Data$data)[which.items]
 names1=colnames(dat1)
 itetypes=extract.mirt(mirtobj,"itemtype")[which.items]
 
-nextmirt2v=mirt(dat1,1,pars="values",itemtype=itetypes)
+nextmirt2v=mirt(dat1,1,pars="values",itemtype=itetypes,technical=list(removeEmptyRows=TRUE))
 rowids=paste(nextmirt2v$item,"_",nextmirt2v$name,sep="")
 
 pars1=mod2values(mirtobj)
