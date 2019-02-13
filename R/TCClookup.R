@@ -32,7 +32,7 @@
 #' @export
 TCClookup=function(mirtobj,fulliterative=FALSE,which.items = NULL){
 #use group parameters to set limits to consider for abilities
-coef1=data.frame(mirt::coef(mirtobj)$GroupPars)
+coef1=data.frame(coef(mirtobj)$GroupPars)
 mean1=coef1[1,1]
 sd1=sqrt(coef1[1,2])
 lowextreme=mean1-12*sd1
