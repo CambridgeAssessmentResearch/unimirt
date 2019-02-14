@@ -4,7 +4,8 @@
 \alias{unimirt}
 \title{Wrapper for "mirt" to facilitate fitting unidimensional models of different types.}
 \usage{
-unimirt(data, short.type = "2", augment.data = TRUE, ...)
+unimirt(data, short.type = "2", augment.data = TRUE, anchor = NULL,
+  ...)
 }
 \arguments{
 \item{data}{A data frame of item data.}
@@ -20,6 +21,13 @@ the variance of the ability distribution rather than fixing all slope parameters
 
 \item{augment.data}{Should missing categories in items be handled by adding cases to the data (default TRUE). Provided
 the overall data set is reasonably large this should have minimal impact on estimated item parameters.}
+
+\item{anchor}{An optional parameter specifying an estimated IRT model to
+use to anchor item parameters. This should be an object already
+estimated either using the function \link[unimirt]{unimirt}
+or by applying the function \link[mirt]{mirt} directly. Any items in the data
+with names equivalent to items with estimated parameters in this object
+will have the item parameters fixed at the pre-estimated values.}
 
 \item{...}{Other parameters to be fed to the function \link[mirt]{mirt}. For example including the option "SE=TRUE" will allow
 standard errors to be calculated. Similarly including (for example) the option 'dentype="Davidian-5"' will allow

@@ -16,6 +16,12 @@
 #' the variance of the ability distribution rather than fixing all slope parameters to have a value of 1.
 #' @param augment.data Should missing categories in items be handled by adding cases to the data (default TRUE). Provided
 #' the overall data set is reasonably large this should have minimal impact on estimated item parameters.
+#' @param anchor An optional parameter specifying an estimated IRT model to
+#' use to anchor item parameters. This should be an object already
+#' estimated either using the function \link[unimirt]{unimirt}
+#' or by applying the function \link[mirt]{mirt} directly. Any items in the data
+#' with names equivalent to items with estimated parameters in this object
+#' will have the item parameters fixed at the pre-estimated values.
 #' @param ... Other parameters to be fed to the function \link[mirt]{mirt}. For example including the option "SE=TRUE" will allow
 #' standard errors to be calculated. Similarly including (for example) the option 'dentype="Davidian-5"' will allow
 #' the model to be estimated with a non-normal ability distribution.
@@ -51,8 +57,9 @@
 #' }
 #' @import mirt
 #' @export
-unimirt=function(data,short.type="2",augment.data=TRUE,...){
+unimirt=function(data,short.type="2",augment.data=TRUE,anchor=NULL,...){
 
+#starting set up
   if(augment.data==TRUE){data=augmentdata(data)}
   if(augment.data==FALSE){
     data=data.frame(data)
@@ -69,14 +76,61 @@ unimirt=function(data,short.type="2",augment.data=TRUE,...){
   itemtype[maxes=="1"]="3PL"
   }
   
+#estimation if no anchor
+if(is.null(anchor)){
   if(!short.type%in%c("1","gpcmfixed")){mirt1=mirt(data,1,itemtype=itemtype,...)}
   
   if(short.type%in%c("1","gpcmfixed")){
-    mirt0=mirt(data,1,itemtype=itemtype,pars="values")
+    mirt0=mirt(data,1,itemtype=itemtype,pars="values",...)
     slopepars=mirt0$parnum[mirt0$name=="a1"]
     mirt1=mirt(data,1,itemtype=itemtype,constrain=list(slopepars),...)
   }
 
   attr(mirt1,"fakedata")=attr(data,"fakedata")  
   return(mirt1)
+}
+
+#estimation if there is an anchor
+if(!is.null(anchor)){
+pars1=mirt(data,1,itemtype=itemtype,pars="values",...)
+pars2=mod2values(anchor)
+
+rowids=paste0(pars1$item,"_",pars1$name,"_",pars1$class)
+rowids2=paste0(pars2$item,"_",pars2$name,"_",pars2$class)
+common=rowids[rowids%in%rowids2]
+common=common[!substr(common,1,6)=="GROUP_"]
+
+if(length(common)==0){
+  if(!short.type%in%c("1","gpcmfixed")){mirt1=mirt(data,1,itemtype=itemtype,...)}
+  
+  if(short.type%in%c("1","gpcmfixed")){
+    mirt0=mirt(data,1,itemtype=itemtype,pars="values",...)
+    slopepars=mirt0$parnum[mirt0$name=="a1"]
+    mirt1=mirt(data,1,itemtype=itemtype,constrain=list(slopepars),...)
+  }
+
+  attr(mirt1,"fakedata")=attr(data,"fakedata")  
+  return(mirt1)
+}
+
+for(id in common){
+	row1=(1:nrow(pars1))[rowids==id]
+	row2=(1:nrow(pars2))[rowids2==id]
+	pars1$value[row1]=pars2$value[row2]  
+	pars1$est[row1]=FALSE
+	}
+pars1$est[pars1$name%in%c("MEAN_1","COV_11")]=TRUE
+
+  if(!short.type%in%c("1","gpcmfixed")){mirt1=mirt(data,1,itemtype=itemtype,pars=pars1,...)}
+  if(short.type%in%c("1","gpcmfixed")){
+	#if fixing slopes then use the previously fixed values
+    pars1$value[pars1$name=="a1"]=pars1$value[pars1$name=="a1" & pars1$est==FALSE][1]
+	pars1$est[pars1$name=="a1"]=FALSE
+    mirt1=mirt(data,1,itemtype=itemtype,pars=pars1,...)
+  }
+
+  attr(mirt1,"fakedata")=attr(data,"fakedata")  
+  return(mirt1)
+}
+
 }
