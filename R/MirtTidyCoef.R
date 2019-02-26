@@ -16,6 +16,7 @@
 #' @export
 MirtTidyCoef=function(mirtobj){
 coef1=data.frame(coef(mirtobj,simplify=TRUE,IRTpar=TRUE)$items)
+coef1=coef1[,order(names(coef1))]#put names in alphabetical order (helps later)
 itenums=1:nrow(coef1)
 itemnames=rownames(coef1)
 a=coef1$a
