@@ -295,10 +295,10 @@ ui <- fluidPage(
         ,
         tabPanel("Item plots"
                  ,"Various plots relating to (groups of) items.
-                 Type 'help(itemplot)' in the console for more information
+                 Type 'help(unimirt.plot)' in the console for more information
                  about what the various options mean."
                  ,fluidRow(uiOutput("plotsel2"))
-                 ,selectInput("plottype","Plot type",c("trace","itemscore","infotrace","score","info","SE"))
+                 ,selectInput("plottype","Plot type",c("trace","cumtrace","itemscore","infotrace","score","info","SE"))
                  ,
                  fluidRow(plotOutput("plot2"))
                  ,

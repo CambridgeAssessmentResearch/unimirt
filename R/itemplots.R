@@ -46,15 +46,17 @@ itemdata=data.frame(item.number=itenums,item.name=itenames
 	,item.se.theta=SEs)
 
 #test results
-testdata=aggregate(itemdata[,c("item.information","item.score")]
+testdata=stats::aggregate(itemdata[,c("item.information","item.score")]
 	,by=list(theta=itemdata$theta),sum)
 names(testdata)=c("theta","test.information","test.score")
 testdata$test.se.theta=sqrt(1/testdata$test.information)
 
 #trace data
-traces=unlist(lapply(which.items
-	,function(i) 
-	as.vector(probtrace(extract.item(mirtobj, i), Theta))))
+tracelist0=lapply(which.items
+                  ,function(i) probtrace(extract.item(mirtobj, i), Theta))
+tracelist=lapply(1:length(tracelist0)
+                 ,function(i) as.vector(tracelist0[[i]]))
+traces=unlist(tracelist)
 maxes=extract.mirt(mirtobj,"K")-1
 maxes=maxes[which.items]
 ncats=maxes+1
@@ -69,6 +71,20 @@ tracedata=data.frame(item.number=traceitenums,item.name=traceitenames
 	,theta=tracetheta
 	,category=as.character(categories)
 	,category.prob=traces)
+
+#cumulative trace
+csfunc=function(mat){mat[,1]=0
+  mat=mat[,ncol(mat):1]
+  mat=t(apply(mat,1,cumsum))
+  mat=mat[,ncol(mat):1]
+  mat[,1]=0
+  return(mat)
+}
+cumtraces=unlist(
+  lapply(1:length(tracelist0),function(i) csfunc(tracelist0[[i]]))
+)
+tracedata$cum.prob=cumtraces
+tracedata$cum.prob[tracedata$category=="0"]=NA
 
 return(list(itemdata=itemdata,testdata=testdata,tracedata=tracedata))
 }
@@ -85,7 +101,9 @@ return(list(itemdata=itemdata,testdata=testdata,tracedata=tracedata))
 #' for users to reformat and customise the look of these plots.
 #' 
 #' @param mirtobj An estimated IRT model (of class SingleGroupClass) estimated either using \link[mirt]{mirt} or \link[unimirt]{unimirt}.
-#' @param type The type of plot to produce. "trace" produces category probability tracce plots, "infotrace" produces item information
+#' @param type The type of plot to produce. "trace" produces category probability tracce plots,
+#'  "cumtrace" produces cumulative probability curve (the chance of achieving each category or above),
+#'  "infotrace" produces item information
 #' curves for each item, "itemscore" produces item characteristic curves for each item, "info" produces total test information
 #' (based on selected items), "SE" produces an idea of the precision of ability estimates based on the selected items,
 #' and "score" gives the test characteristic curve (based on the selected items).
@@ -101,6 +119,7 @@ return(list(itemdata=itemdata,testdata=testdata,tracedata=tracedata))
 #' unimirt.plot(mirt1,"trace",which.items=34,thetamin=-4,thetamax=4)
 #' unimirt.plot(mirt1,"trace",which.items=c(1,9),thetamin=-4,thetamax=4)
 #' unimirt.plot(mirt1,"trace",which.items=c(1,9,12,34),thetamin=-4,thetamax=4)
+#' unimirt.plot(mirt1,"cumtrace",which.items=34,thetamin=-4,thetamax=4)
 #' unimirt.plot(mirt1,"infotrace",which.items=c(1,9,12,34),thetamin=-4,thetamax=4)
 #' unimirt.plot(mirt1,"itemscore",which.items=c(1,9,12,34),thetamin=-4,thetamax=4)
 #' unimirt.plot(mirt1,"info",which.items=c(1,9,12,34),thetamin=-4,thetamax=4)
@@ -110,7 +129,7 @@ return(list(itemdata=itemdata,testdata=testdata,tracedata=tracedata))
 #' @export
 unimirt.plot=function(mirtobj,type,which.items=NULL,thetamin=NULL,thetamax=NULL){
 
-if(!(type %in% c("trace","infotrace","itemscore","info","SE","score"))){
+if(!(type %in% c("trace","cumtrace","infotrace","itemscore","info","SE","score"))){
 	stop('type supplied is not supported')
 	}
 
@@ -124,6 +143,12 @@ plotdat=itemplotdata(mirtobj,which.items=which.items,Theta=theta)
 if(type=="trace"){
 ggp=ggplot(data=plotdat$tracedata
 	,aes(x=theta,y=category.prob,col=item.name,lty=category))+geom_line()+ylim(0,1)
+}
+
+#cumulative trace
+if(type=="cumtrace"){
+  ggp=ggplot(data=plotdat$tracedata[!plotdat$tracedata$category=="0",]
+                          ,aes(x=theta,y=cum.prob,col=item.name,lty=category))+geom_line()+ylim(0,1)
 }
 
 #infotrace

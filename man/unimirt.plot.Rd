@@ -10,7 +10,9 @@ unimirt.plot(mirtobj, type, which.items = NULL, thetamin = NULL,
 \arguments{
 \item{mirtobj}{An estimated IRT model (of class SingleGroupClass) estimated either using \link[mirt]{mirt} or \link[unimirt]{unimirt}.}
 
-\item{type}{The type of plot to produce. "trace" produces category probability tracce plots, "infotrace" produces item information
+\item{type}{The type of plot to produce. "trace" produces category probability tracce plots,
+ "cumtrace" produces cumulative probability curve (the chance of achieving each category or above),
+ "infotrace" produces item information
 curves for each item, "itemscore" produces item characteristic curves for each item, "info" produces total test information
 (based on selected items), "SE" produces an idea of the precision of ability estimates based on the selected items,
 and "score" gives the test characteristic curve (based on the selected items).}
@@ -40,6 +42,7 @@ mirt1=unimirt(mathsdata)
 unimirt.plot(mirt1,"trace",which.items=34,thetamin=-4,thetamax=4)
 unimirt.plot(mirt1,"trace",which.items=c(1,9),thetamin=-4,thetamax=4)
 unimirt.plot(mirt1,"trace",which.items=c(1,9,12,34),thetamin=-4,thetamax=4)
+unimirt.plot(mirt1,"cumtrace",which.items=34,thetamin=-4,thetamax=4)
 unimirt.plot(mirt1,"infotrace",which.items=c(1,9,12,34),thetamin=-4,thetamax=4)
 unimirt.plot(mirt1,"itemscore",which.items=c(1,9,12,34),thetamin=-4,thetamax=4)
 unimirt.plot(mirt1,"info",which.items=c(1,9,12,34),thetamin=-4,thetamax=4)
