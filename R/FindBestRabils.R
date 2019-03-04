@@ -58,6 +58,10 @@ rabilsbest=sapply(1:nitems
                                  ,interval=c(-8*sd1,8*sd1)
                                  ,maximum=TRUE,i=i)$objective)
 
+#set to negative if negative slope
+acoef=data.frame(coef(mirtobj,simplify=TRUE,IRTpar=TRUE)$items)$a
+rabilsbest[acoef<0]=-1*rabilsbest[acoef<0]
+
 #could get area under information curves and area under information curve per mark as well
 #aucs=sapply(1:nitems,function(i) areainfo(mirtobj,c(-10*sd1,10*sd1),i)$Info)
 #aucspermark=aucs/maxes

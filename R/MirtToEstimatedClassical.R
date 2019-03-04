@@ -44,6 +44,10 @@ MirtToEstimatedClassical=function(mirtobj,theta=NULL,qwts=NULL){
   r2func=function(i,qwts){(1+(sum(vilist[[i]]*qwts))/(sum((eilist[[i]]^2)*qwts)-sum(eilist[[i]]*qwts)^2))^-1}
   r2s=sapply(1:nitems,r2func,qwts=qwts)
   rabils=sqrt(r2s)#note that this correlation accounts for the non-linear relationship between ability and item scores
+  #set to negative if negative slope
+  acoef=data.frame(coef(mirtobj,simplify=TRUE,IRTpar=TRUE)$items)$a
+  rabils[acoef<0]=-1*rabils[acoef<0]
+  
   rabilsbest=FindBestRabils(mirtobj)
   
   ClassStats=data.frame(Item=itenames,Max=maxes,Mean=means

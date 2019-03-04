@@ -34,9 +34,15 @@ for (itenum in 1:length(coef1)){
 
 names(allcoefSE)=paste(names(allcoefSE),".SE",sep="")
 allcoef=cbind(allcoef,allcoefSE)
-#put columns in alphabetical order
-colord=order(names(allcoef))
-allcoef=allcoef[,colord]
+#put columns in alphabetical order (with SEs next to relevant thing)
+#(extra code to ensure that b2 is ordered before b10)
+nam1=names(allcoef)
+nam1a=substr(nam1,1,1)
+nam1dot=regexpr("\\.",nam1)
+nam1dot[nam1dot<0]=99
+nam1b=as.numeric(substr(nam1,2,(nam1dot-1)))
+allcoef=allcoef[,order(nam1a,nam1b,na.last = FALSE)]
+
 #remove dummy starter row
 allcoef=allcoef[-1,]
 
