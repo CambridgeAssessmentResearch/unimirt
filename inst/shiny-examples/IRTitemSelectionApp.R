@@ -25,7 +25,9 @@ navlistPanel(
   tabPanel("Manual selections",
            selectInput("sel1", "First select an IRT analysis",loadofmirts)
            ,br(),br()
-           ,"Can optionally alter the desired population ability distribution"
+           ,"Can optionally alter the desired population ability distribution.
+           By default, to begin with, when a new model object is selected
+           this is used to determine the mean and SD used during item calibration."
            ,splitLayout(numericInput("thetamean","Mean",value=0,step=0.1,min=-3,max=3)
                         ,numericInput("thetasd","SD",value=1,step=0.1,min=0.1,max=3.5))
            ,br(),br()
@@ -151,6 +153,14 @@ server <- function(input, output,session) {
   #thetas=reactive({tempmirt1()@Model$Theta})
   thetas=reactive({tempmirt1()@Model$Theta
     as.matrix(seq(-6,6,length=201))})
+  
+  observe({
+    updateNumericInput(session,"thetamean","Mean"
+                       ,value=data.frame(coef(tempmirt1())$GroupPars)$MEAN_1[1])
+    updateNumericInput(session,"thetasd","SD"
+                        ,value=sqrt(data.frame(coef(tempmirt1())$GroupPars)$COV_11[1]))
+  })
+  
   #qwts=reactive({extract.mirt(tempmirt1(),"Prior")[[1]]})
   qwts=reactive({temp1=dnorm(as.numeric(thetas()),input$thetamean,input$thetasd)
                 temp1/sum(temp1)})
