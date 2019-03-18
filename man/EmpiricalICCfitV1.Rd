@@ -33,5 +33,5 @@ on the whole test. If the total test scores include the item itself then technic
 calculates the expected relationship against total scores on a parallel test so (for example) a raw total score of zero
 will not necessarily imply a definite score of zero on the item.
 
-Currently not exported and just used as a subroutine within the function EmpiricalICCfit
+Currently just used as a subroutine within the function EmpiricalICCfit
 }

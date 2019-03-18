@@ -108,7 +108,6 @@ EmpiricalICCfit=function(mirtobj,itenum,which.items=NULL,ngroups=1){
   itescore=itescore[keep]
   scoretot=scoretot[keep]
   scoregroups=scoretot
-  #ngroups=10
   if(ngroups>1){
     cuts=seq(0,1,length=ngroups+1)[-c(1,ngroups+1)]
     scoregroups=findInterval(scoretot,stats::quantile(scoretot,cuts))
@@ -118,12 +117,10 @@ EmpiricalICCfit=function(mirtobj,itenum,which.items=NULL,ngroups=1){
                                ,N=table(scoregroups)
   )
   
-  plot1=ggplot(data=modelchartdat,aes(x=raw.score,y=item.score))+geom_line()+
-    geom_point(data=empiricalchartdat,alpha=0.5,aes(size=N.Freq))+
+  plot1=ggplot(data=modelchartdat,aes_string(x="raw.score",y="item.score"))+geom_line()+
+    geom_point(data=empiricalchartdat,alpha=0.5,aes_string(size="N.Freq"))+
     scale_size_area()+ylim(0,imax)+xlim(0,totmax)
-  #print(plot1)
-  
-    
+
   return(list(plot1=plot1,modelchartdat=modelchartdat,empiricalchartdat=empiricalchartdat))
   
 }
@@ -138,7 +135,7 @@ EmpiricalICCfit=function(mirtobj,itenum,which.items=NULL,ngroups=1){
 #' calculates the expected relationship against total scores on a parallel test so (for example) a raw total score of zero
 #' will not necessarily imply a definite score of zero on the item. 
 #' 
-#' Currently not exported and just used as a subroutine within the function EmpiricalICCfit
+#' Currently just used as a subroutine within the function EmpiricalICCfit
 #' 
 #' @param mirtobj An estimated IRT model (of class SingleGroupClass) estimated either using the function "unimirt"
 #' or by applying the function "mirt" directly.
@@ -228,13 +225,11 @@ EmpiricalICCfitV1=function(mirtobj,itenum,which.items=NULL,ngroups=1){
   )
   
   maxes=extract.mirt(mirtobj,"K")-1
-  #print(maxes[itenum])
-    
-  plot1=ggplot(data=modelchartdat,aes(x=raw.score,y=item.score))+geom_line()+
-    geom_point(data=empiricalchartdat,alpha=0.5,aes(size=N.Freq))+
+
+  plot1=ggplot(data=modelchartdat,aes_string(x="raw.score",y="item.score"))+geom_line()+
+    geom_point(data=empiricalchartdat,alpha=0.5,aes_string(size="N.Freq"))+
     scale_size_area()+ylim(0,maxes[itenum])
-  #print(plot1)
-  
+
   return(list(plot1=plot1,modelchartdat=modelchartdat,empiricalchartdat=empiricalchartdat))
   
 }

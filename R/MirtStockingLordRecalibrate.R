@@ -125,7 +125,7 @@ if(!is.null(lab2)){obj2lab=lab2}
 cdata=data.frame(Ability=rep(as.numeric(thetas),2)
                   ,Expected_Score=c(etest1,etest2)
                  ,Object=c(rep(obj1lab,nquad),rep(obj2lab,nquad)))
-eplot=ggplot(data=cdata,aes(x=Ability,y=Expected_Score,col=Object))+geom_line()
+eplot=ggplot(data=cdata,aes_string(x="Ability",y="Expected_Score",col="Object"))+geom_line()
 return(eplot)
 }
 
@@ -167,7 +167,7 @@ bcoef=merge(difslong1,difslong2,sort=FALSE)
 mindif=min(c(bcoef$C1_dif,bcoef$C2_dif))
 maxdif=max(c(bcoef$C1_dif,bcoef$C2_dif))
 range1=c(floor(mindif),ceiling(maxdif))
-iteplot=ggplot(data=bcoef,aes(x=C1_dif,y=C2_dif,label=names))+
+iteplot=ggplot(data=bcoef,aes_string(x="C1_dif",y="C2_dif",label="names"))+
   geom_text()+geom_abline()+geom_point(alpha=0.3)+
   scale_x_continuous(limits=range1)+
   scale_y_continuous(limits=range1)+
@@ -182,7 +182,7 @@ acoef=merge(coef1,coef2,sort=FALSE)
 mina=min(c(acoef$C1_a,acoef$C2_a))
 maxa=max(c(acoef$C1_a,acoef$C2_a))
 rangea1=c(floor(mina),ceiling(maxa))
-iteplot=ggplot(data=acoef,aes(x=C1_a,y=C2_a,label=Item))+
+iteplot=ggplot(data=acoef,aes_string(x="C1_a",y="C2_a",label="Item"))+
   geom_text()+geom_abline()+
   scale_x_continuous(limits=rangea1)+
   scale_y_continuous(limits=rangea1)+

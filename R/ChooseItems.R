@@ -39,21 +39,20 @@ ChooseItems=function(idata,maxvar,
   
   nite=nrow(idata)
   
-  MIPbit=MIPModel() %>%
-    add_variable(x[i], i = 1:nite, type = "binary")%>%
-    set_objective(sum_expr(idata[i,maxvar] * x[i], i = 1:nite), "max")
+  MIPbit=MIPModel()
+  MIPbit=add_variable(MIPbit,x[i], i = 1:nite, type = "binary")
+  MIPbit=set_objective(MIPbit,sum_expr(idata[i,maxvar] * x[i], i = 1:nite), "max")
   
   if(length(constrvars)>0){
     for (constr in 1:length(constrvars)){
-      MIPbit=MIPbit%>%add_constraint(sum_expr(idata[i,constrvars[constr]] * x[i], i = 1:nite) <= constrmaxs[constr]) %>%
-        add_constraint(sum_expr(idata[i,constrvars[constr]] * x[i], i = 1:nite) >= constrmins[constr])
+      MIPbit=add_constraint(MIPbit,sum_expr(idata[i,constrvars[constr]] * x[i], i = 1:nite) <= constrmaxs[constr])
+      MIPbit=add_constraint(MIPbit,sum_expr(idata[i,constrvars[constr]] * x[i], i = 1:nite) >= constrmins[constr])
     }
   }
   
-  
-  MIPbit=MIPbit%>%solve_model(with_ROI(solver = "lpsolve")) %>% 
-    get_solution(x[i]) %>% 
-    filter(value > 0)
+  MIPbit=solve_model(MIPbit,with_ROI(solver = "lpsolve"))
+  MIPbit=get_solution(MIPbit,x[i]) 
+  MIPbit=MIPbit[MIPbit$value>0,]
   
   choose=MIPbit$i
   return(choose)

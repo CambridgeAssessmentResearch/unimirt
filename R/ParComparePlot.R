@@ -29,8 +29,6 @@
 #' @export
 ParComparePlot=function(mirtobjlist,mirtnames=NULL
                         ,commononly=TRUE,compare = "Difficulties"){
-#mirtobjlist=list(mathmirt1,newmirt2)
-#mirtnames=c("mathmirt1","newmirt2")
 
 if(is.null(mirtnames)){mirtnames=paste0("obj",1:length(mirtobjlist))}
   
@@ -69,11 +67,11 @@ ites=ites[length(ites):1]
 tidy1$Item=factor(tidy1$Item,levels=ites)
 
 if(compare=="Slopes"){
-gg1=ggplot(data=tidy1,aes(x=Item,y=a,label=Item,col=object))+geom_text(position=position_dodge(width=1))
+gg1=ggplot(data=tidy1,aes_string(x="Item",y="a",label="Item",col="object"))+geom_text(position=position_dodge(width=1))
 gg1=gg1+labs(x=NULL,y="IRT Slope",col="Object")
 
 if("a.SE"%in%names(tidy)){
-  gg1=gg1+geom_errorbar(aes(ymax=ahigh,ymin=alow),alpha=0.5,position=position_dodge(width=1))
+  gg1=gg1+geom_errorbar(aes_string(ymax="ahigh",ymin="alow"),alpha=0.5,position=position_dodge(width=1))
 }
 
 gg1=gg1+coord_flip()+theme_minimal()
@@ -81,11 +79,11 @@ return(gg1)
 }
 
 if(compare=="Guessing"){
-gg1=ggplot(data=tidy1,aes(x=Item,y=g,label=Item,col=object))+geom_text(position=position_dodge(width=1))
+gg1=ggplot(data=tidy1,aes_string(x="Item",y="g",label="Item",col="object"))+geom_text(position=position_dodge(width=1))
 gg1=gg1+labs(x=NULL,y="IRT guessing parameter",col="Object")
 
 if("g.SE"%in%names(tidy)){
-  gg1=gg1+geom_errorbar(aes(ymax=ghigh,ymin=glow),alpha=0.5,position=position_dodge(width=1))
+  gg1=gg1+geom_errorbar(aes_string(ymax="ghigh",ymin="glow"),alpha=0.5,position=position_dodge(width=1))
 }
 
 gg1=gg1+coord_flip()+theme_minimal()
@@ -120,11 +118,11 @@ ites=unique(tb$Item)
 ites=ites[length(ites):1]
 tb$Item=factor(tb$Item,levels=ites)
 
-gg1=ggplot(data=tb,aes(x=Item,y=b,label=Item,col=object))+geom_text(position=position_dodge(width=1))
+gg1=ggplot(data=tb,aes_string(x="Item",y="b",label="Item",col="object"))+geom_text(position=position_dodge(width=1))
 gg1=gg1+labs(x=NULL,y="IRT Difficulty",col="Object")
 
 if("b.SE"%in%names(tb)){
-  gg1=gg1+geom_errorbar(aes(ymax=bhigh,ymin=blow),alpha=0.5,position=position_dodge(width=1))
+  gg1=gg1+geom_errorbar(aes_string(ymax="bhigh",ymin="blow"),alpha=0.5,position=position_dodge(width=1))
 }
 
 gg1=gg1+coord_flip()+theme_minimal()
@@ -132,9 +130,3 @@ gg1
 
 return(gg1)
 }
-
-#ParComparePlot(list(mathmirt1,newmirt2),compare = "Difficulties")
-#ParComparePlot(list(mathmirt1,newmirt2,mirt1),compare = "Slopes")
-#ParComparePlot(list(mathmirt1,newmirt2),commononly=FALSE,compare = "Difficulties")
-#ParComparePlot(list(mirt1),commononly=FALSE,compare = "Difficulties")
-#ParComparePlot(list(mirt1),commononly=FALSE,compare = "Slopes")

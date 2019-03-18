@@ -21,11 +21,12 @@
 #'
 #' @seealso \code{\link[mirt]{expected.test}}
 #' @examples
-#' mirt1=unimirt(mathsdata,"3")
+#' mirt1=unimirt(mathsdata[,1:20],"3")
 #' #method based on interpolation
 #' TCC1=TCClookup(mirt1)
 #' #method based on full iterative identification of ability points
 #' TCC2=TCClookup(mirt1,fulliterative=TRUE)
+#' #demonstrate that differences are trivial (at least in this example)
 #' plot(TCC1$score,TCC1$TCCabil-TCC2$TCCabil,type='l')
 #' #apply to first five items in test
 #' TCC3=TCClookup(mirt1,which.items=1:5)
