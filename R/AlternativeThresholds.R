@@ -9,7 +9,7 @@
 #' 
 #' @param mirtobj An estimated IRT model (of class SingleGroupClass) estimated using \link[mirt]{mirt} or \link[unimirt]{unimirt}.
 #' @param which.items an integer vector indicating which items to include. By default all items are included.
-#' @param prob Probility of success for which thresholds are required.
+#' @param prob Probability of success for which thresholds are required.
 #' 
 #' @return A data frame of Thurstonian thresholds.
 #'
