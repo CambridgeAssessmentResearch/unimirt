@@ -36,26 +36,30 @@ ChooseItems=function(idata,maxvar,
                      constrvars=NULL,
                      constrmins=NULL,
                      constrmaxs=NULL){
-  
+ 
+#attempt to get round CRAN global variables check by defining variables and then removing them
+verytempxvariable1=NA
+i=NA
+rm(verytempxvariable1)
+rm(i)
+#
+
   nite=nrow(idata)
-  
   MIPbit=MIPModel()
-  MIPbit=add_variable(MIPbit,x[i], i = 1:nite, type = "binary")
-  MIPbit=set_objective(MIPbit,sum_expr(idata[i,maxvar] * x[i], i = 1:nite), "max")
+  MIPbit=add_variable(MIPbit,verytempxvariable1[i], i = 1:nite, type = "binary")
+  MIPbit=set_objective(MIPbit,sum_expr(idata[i,maxvar] * verytempxvariable1[i], i = 1:nite), "max")
   
   if(length(constrvars)>0){
     for (constr in 1:length(constrvars)){
-      MIPbit=add_constraint(MIPbit,sum_expr(idata[i,constrvars[constr]] * x[i], i = 1:nite) <= constrmaxs[constr])
-      MIPbit=add_constraint(MIPbit,sum_expr(idata[i,constrvars[constr]] * x[i], i = 1:nite) >= constrmins[constr])
+      MIPbit=add_constraint(MIPbit,sum_expr(idata[i,constrvars[constr]] * verytempxvariable1[i], i = 1:nite) <= constrmaxs[constr])
+      MIPbit=add_constraint(MIPbit,sum_expr(idata[i,constrvars[constr]] * verytempxvariable1[i], i = 1:nite) >= constrmins[constr])
     }
   }
   
   MIPbit=solve_model(MIPbit,with_ROI(solver = "lpsolve"))
-  MIPbit=get_solution(MIPbit,x[i]) 
+  MIPbit=get_solution(MIPbit,verytempxvariable1[i]) 
   MIPbit=MIPbit[MIPbit$value>0,]
   
   choose=MIPbit$i
   return(choose)
 }
-
-

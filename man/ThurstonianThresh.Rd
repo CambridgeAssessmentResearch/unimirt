@@ -4,19 +4,22 @@
 \alias{ThurstonianThresh}
 \title{Thurstonian thresholds}
 \usage{
-ThurstonianThresh(mirtobj, which.items = NULL)
+ThurstonianThresh(mirtobj, which.items = NULL, prob = 0.5)
 }
 \arguments{
 \item{mirtobj}{An estimated IRT model (of class SingleGroupClass) estimated using \link[mirt]{mirt} or \link[unimirt]{unimirt}.}
 
 \item{which.items}{an integer vector indicating which items to include. By default all items are included.}
+
+\item{prob}{Probility of success for which thresholds are required.}
 }
 \value{
 A data frame of Thurstonian thresholds.
 }
 \description{
 The Thurstonian threshold for a score category is defined as the ability at which the probability of achieving 
-that score or higher reaches 0.50. For items analysed using the graded response model or for dichotomous items analysed
+that score or higher reaches the user-defined "prob" (0.5 by default).
+If prob=0.5, for items analysed using the graded response model or for dichotomous items analysed
 as part of a model using the (generalised) partial credit model (or Rasch) these will be equal to the usual difficulty parameters. 
 However, Thurstonian thresholds may be a useful way of understanding the difficulty of marks within
 polytomous items under the (generalised) partial credit model. This function calculates these.
@@ -24,11 +27,14 @@ polytomous items under the (generalised) partial credit model. This function cal
 \examples{
 \dontrun{
 #model using "Science" data from mirt package
-#for graded response model Thurstonian thresholds 
+#for graded response model Thurstonian thresholds (for prob=0.5)
 #and item difficulty parameters are the same
 scimod=unimirt(Science[,1:4]-1)
 unimirt::MirtTidyCoef(scimod)
 ThurstonianThresh(scimod)
+
+#will vary for other probs
+ThurstonianThresh(scimod,prob=0.1)
 
 #for gpcm (or Rasch) model they needn't be
 mirtobj=unimirt(Science[,1:4]-1,"gpcmfixed")

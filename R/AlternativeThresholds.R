@@ -1,24 +1,29 @@
 #' Thurstonian thresholds
 #' 
 #' The Thurstonian threshold for a score category is defined as the ability at which the probability of achieving 
-#' that score or higher reaches 0.50. For items analysed using the graded response model or for dichotomous items analysed
+#' that score or higher reaches the user-defined "prob" (0.5 by default).
+#' If prob=0.5, for items analysed using the graded response model or for dichotomous items analysed
 #' as part of a model using the (generalised) partial credit model (or Rasch) these will be equal to the usual difficulty parameters. 
 #' However, Thurstonian thresholds may be a useful way of understanding the difficulty of marks within
 #' polytomous items under the (generalised) partial credit model. This function calculates these.
 #' 
 #' @param mirtobj An estimated IRT model (of class SingleGroupClass) estimated using \link[mirt]{mirt} or \link[unimirt]{unimirt}.
 #' @param which.items an integer vector indicating which items to include. By default all items are included.
+#' @param prob Probility of success for which thresholds are required.
 #' 
 #' @return A data frame of Thurstonian thresholds.
 #'
 #' @examples
 #' \dontrun{
 #' #model using "Science" data from mirt package
-#' #for graded response model Thurstonian thresholds 
+#' #for graded response model Thurstonian thresholds (for prob=0.5)
 #' #and item difficulty parameters are the same
 #' scimod=unimirt(Science[,1:4]-1)
 #' unimirt::MirtTidyCoef(scimod)
 #' ThurstonianThresh(scimod)
+#' 
+#' #will vary for other probs
+#' ThurstonianThresh(scimod,prob=0.1)
 #' 
 #' #for gpcm (or Rasch) model they needn't be
 #' mirtobj=unimirt(Science[,1:4]-1,"gpcmfixed")
@@ -26,62 +31,64 @@
 #' ThurstonianThresh(mirtobj)
 #' }
 #' @export
-ThurstonianThresh=function(mirtobj,which.items=NULL){
+ThurstonianThresh <- function (mirtobj, which.items = NULL, prob = 0.5) 
+{
+  nitems = extract.mirt(mirtobj, "nitems")
+  itenames = extract.mirt(mirtobj, "itemnames")
+  ncats = extract.mirt(mirtobj, "K")
+  maxes = ncats - 1
+  itypes = extract.mirt(mirtobj, "itemtype")
+  coef1a = unimirt::MirtTidyCoef(mirtobj)
+  coef1 = coef1a[, !names(coef1a) %in% c("a", "g", "u")]
+  #use mathematical formula for GRM to give starting value (can adjust later)
+  #thursthresh=b+qlogis(prob)/a
+  for(col in 2:ncol(coef1)){coef1[,col]=coef1[,col]+stats::qlogis(prob)/coef1a$a}
 
-nitems=extract.mirt(mirtobj,"nitems")
-itenames=extract.mirt(mirtobj,"itemnames")
-ncats=extract.mirt(mirtobj,"K")
-maxes=ncats-1
-itypes=extract.mirt(mirtobj,"itemtype")
-coef1=unimirt::MirtTidyCoef(mirtobj)
-coef1=coef1[,!names(coef1)%in%c("a","g","u")]
-
-if(is.null(which.items)){
-which.items=1:nitems
-}
-
-itenames=itenames[which.items]
-nitems=length(which.items)
-maxes=maxes[which.items]
-itypes=itypes[which.items]
-coef1=coef1[which.items,]
-
-thetas=range(mirtobj@Model$Theta)
-range2=thetas[2]-thetas[1]
-thetas[1]=thetas[1]-2*range2
-thetas[2]=thetas[2]+2*range2
-
-threshmat=matrix(NA,nrow=nitems,ncol=max(maxes))
-coef1=coef1[,1:(max(maxes)+1)]
-for(row in 1:nrow(threshmat)){
-threshmat[row,]=as.numeric(coef1[row,-1])
-}
-
-#function to find threshold for particular item and score
-thursfunc=function(ite,score){
-pgreater=function(theta){sum(mirt::probtrace(mirt::extract.item(mirtobj,ite),theta)[(1:ncats[ite])>score])}
-p2=function(theta){pgreater(theta)-0.5}
-stats::uniroot(p2,c(min(thetas)-12,max(thetas)+12),extendInt="yes")$root
-}
-
-#identify which rows needs search for Thurstonian threshold
-#(i.e. not equal to existing parameter)
-whichrows=(1:nrow(threshmat))
-notrows=(1:nrow(threshmat))[itypes%in%c("2PL","graded")
-				|(maxes==1 & itypes%in%c("Rasch","gpcm"))]
-if(length(notrows)>0){whichrows=(1:nrow(threshmat))[-notrows]}
-
-for(row in whichrows){
-for(col in 1:ncol(threshmat)){
-#don't need extra function if mark doesn't exist
-if(!is.na(threshmat[row,col])){
-threshmat[row,col]=thursfunc(which.items[row],col)
-}
-}}
-
-colnames(threshmat)=paste0("thur.b",1:ncol(threshmat))
-threshmat=cbind(data.frame(Item=itenames),data.frame(threshmat))
-return(threshmat)
+  if (is.null(which.items)) {
+    which.items = 1:nitems
+  }
+  itenames = itenames[which.items]
+  nitems = length(which.items)
+  maxes = maxes[which.items]
+  itypes = itypes[which.items]
+  coef1 = coef1[which.items, ]
+  thetas = range(mirtobj@Model$Theta)
+  range2 = thetas[2] - thetas[1]
+  thetas[1] = thetas[1] - 2 * range2
+  thetas[2] = thetas[2] + 2 * range2
+  threshmat = matrix(NA, nrow = nitems, ncol = max(maxes))
+  coef1 = coef1[, 1:(max(maxes) + 1)]
+  for (row in 1:nrow(threshmat)) {
+    threshmat[row, ] = as.numeric(coef1[row, -1])
+  }
+  thursfunc = function(ite, score, prob) {
+    pgreater = function(theta) {
+      sum(mirt::probtrace(mirt::extract.item(mirtobj, ite), 
+                          theta)[(1:ncats[ite]) > score])
+    }
+    p2 = function(theta, prob) {
+      pgreater(theta) - prob
+    }
+    stats::uniroot(p2, c(min(thetas) - 12, max(thetas) + 
+                           12), prob, extendInt = "yes")$root
+  }
+  whichrows = (1:nrow(threshmat))
+  notrows = (1:nrow(threshmat))[itypes %in% c("2PL", "graded") 
+                                  |(maxes == 1 & itypes %in% c("Rasch", "gpcm"))]
+  if (length(notrows) > 0) {
+    whichrows = (1:nrow(threshmat))[-notrows]
+  }
+  for (row in whichrows) {
+    for (col in 1:ncol(threshmat)) {
+      if (!is.na(threshmat[row, col])) {
+        threshmat[row, col] = thursfunc(which.items[row], 
+                                        col, prob)
+      }
+    }
+  }
+  colnames(threshmat) = paste0("thur.b", 1:ncol(threshmat))
+  threshmat = cbind(data.frame(Item = itenames), data.frame(threshmat))
+  return(threshmat)
 }
 
 #' Location of each item's maximum information
