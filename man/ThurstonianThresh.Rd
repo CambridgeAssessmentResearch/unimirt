@@ -11,7 +11,7 @@ ThurstonianThresh(mirtobj, which.items = NULL, prob = 0.5)
 
 \item{which.items}{an integer vector indicating which items to include. By default all items are included.}
 
-\item{prob}{Probility of success for which thresholds are required.}
+\item{prob}{Probability of success for which thresholds are required.}
 }
 \value{
 A data frame of Thurstonian thresholds.
