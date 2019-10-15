@@ -10,6 +10,7 @@ library(ROI)
 library(ompr.roi)
 library(ompr)
 library(dplyr)
+library(unimirt)
 options(shiny.maxRequestSize = 30*1024^2)
 
 nulltozero=function(x){if(is.null(x)){return(0)}
