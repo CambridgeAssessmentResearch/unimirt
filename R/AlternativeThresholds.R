@@ -52,14 +52,19 @@ ThurstonianThresh <- function (mirtobj, which.items = NULL, prob = 0.5)
   maxes = maxes[which.items]
   itypes = itypes[which.items]
   coef1 = coef1[which.items, ]
+  coef1a = coef1a[which.items, ]
   thetas = range(mirtobj@Model$Theta)
   range2 = thetas[2] - thetas[1]
   thetas[1] = thetas[1] - 2 * range2
   thetas[2] = thetas[2] + 2 * range2
   threshmat = matrix(NA, nrow = nitems, ncol = max(maxes))
   coef1 = coef1[, 1:(max(maxes) + 1)]
+  gs=coef1a$g
+  gs[is.na(gs)]=0
   for (row in 1:nrow(threshmat)) {
+    if(gs[row]<prob){
     threshmat[row, ] = as.numeric(coef1[row, -1])
+    }
   }
   thursfunc = function(ite, score, prob) {
     pgreater = function(theta) {

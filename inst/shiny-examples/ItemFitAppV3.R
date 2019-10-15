@@ -1,4 +1,6 @@
 #version to work with models fitted using syntax
+#also uses WLE ability estimates rather than plausible value throughout
+#this can be a little slower
 
 #Global statements
 library(shiny)
@@ -18,13 +20,9 @@ server <- function(input, output,session) {
 
   tempmirt1=reactive({get(input$sel1)})
   thetas=reactive({
-    set.seed(293472397)
-    #fs1=fscores(tempmirt1(),method="plausible"
-    #            ,use_dentype_estimate = TRUE
-    #            )
-    fs1=as.matrix(MirtUniPVs(tempmirt1(),excludefake=FALSE))
-    set.seed(as.numeric(Sys.time()))
-    fs1})
+    as.matrix(data.frame(fscores(tempmirt1(),method="WLE"))$F1)
+  })
+  
   anymiss=reactive({sum(is.na(GetDataFromMirt(tempmirt1())))>0})
  
   coefs=reactive({
@@ -37,6 +35,7 @@ server <- function(input, output,session) {
     })
   
   fits=reactive({
+    
     if(anymiss()==TRUE){
       quickfits=itemfit(tempmirt1(),fit_stats=c("X2"),Theta=thetas(),mincell.X2=0)
     }
@@ -346,7 +345,7 @@ ui <- fluidPage(
                  each item to the model. Fit is calculated using a
                  chi-square test comparing how expected achievement
                  on each item given ability relates to actual achievement
-                 for groups of pupils with different levels of ability (estimated using plausible values)."
+                 for groups of pupils with different levels of ability (estimated using WLE estimates)."
                  ,br(),br()
                  ,"Where a Rasch model has been fitted and data is available for all items
                  for all candidates, INFIT and OUTFIT statistics are also provided."
@@ -448,8 +447,8 @@ ui <- fluidPage(
         ,
         tabPanel("Ability distributions"
                  ,"The line shows the theoretical ability distribution.
-                  The shaded area shows the distribution of estimated plausible ability values
-                 for each pupil. Obvious discrepancies may indicate that
+                  The shaded area shows the distribution of estimated WLE values
+                 for each pupil. Very large discrepancies in shape may indicate that
                  the theoretical shape of the ability distribution is not quite correct."
                  ,br(),br()
                  ,fluidRow(plotOutput("abilplot"))
@@ -459,8 +458,8 @@ ui <- fluidPage(
         ,
         tabPanel("Wright Map"
                  ,"The black line shows the (smoothed) distribution of item difficulties (or Thurstonian Thresholds).
-                  The red shaded area shows the distribution of estimated plausible ability values
-                 (abilities). This allows a assessment of how the general difficulty of items relates to the
+                  The red shaded area shows the distribution of estimated abilities (WLE estimates). 
+                This allows a assessment of how the general difficulty of items relates to the
                  ability of the cohort."
                  ,br(),br()
                  ,"The difficulties (or thresholds) of individual items are also shown on the chart.

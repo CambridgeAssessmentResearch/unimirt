@@ -1,17 +1,23 @@
+#INTERACTIVE VERSION
+#UPLOAD A MODEL FITTED PREVIOUSLY (INTERACTIVELY) RATHER THAN 
+#A MODEL FROM THE GLOBAL WORKSPACE
+
 #Global statements
 library(ggplot2)
 library(mirt)
 library(shiny)
-library(ROI.plugin.lpsolve)
 library(ROI)
 library(ompr.roi)
 library(ompr)
 library(dplyr)
-globls=ls(name=".GlobalEnv")
-classes=NULL
-for(i in 1:length(globls)){classes=c(classes,as.vector(paste(class(get(globls[i])),collapse="") ))}
-loadofmirts=ls(name=".GlobalEnv")[classes=="SingleGroupClass"]
-print(loadofmirts)
+options(shiny.maxRequestSize = 30*1024^2)
+
+nulltozero=function(x){if(is.null(x)){return(0)}
+  x
+  }
+nulltoone=function(x){if(is.null(x)){return(1)}
+  x
+}
 
 #UI
 #UI
@@ -23,7 +29,7 @@ ui <- fluidPage(
   titlePanel("Item selection/test construction"),
 navlistPanel(
   tabPanel("Manual selections",
-           selectInput("sel1", "First select an IRT analysis",loadofmirts)
+           fileInput('existingmodel', "First upload an '.RData' file containing an existing IRT model")
            ,br(),br()
            ,"Can optionally alter the desired population ability distribution.
            By default, to begin with, when a new model object is selected
@@ -119,6 +125,7 @@ navlistPanel(
                     If this table is missing it was not possible to find
                     a selection of items matching the constraints."
                     ,tableOutput("idata1aopt")
+                    ,downloadButton("downloadSelection", "Download")
                     ,br(),br()
                     ,"The table below simply list all of the data available 
                     for all of the items that can be used in optimisation."
@@ -146,19 +153,45 @@ navlistPanel(
 #SERVER
 server <- function(input, output,session) {
   
+  #upload model
+  upmodel=reactiveValues(model=NULL)
+  observeEvent(input$existingmodel, {
+    modin=input$existingmodel
+    if(is.null(modin)){upmodel$model=NULL}
+    if(!is.null(modin)){
+      modfile <- input$existingmodel$datapath
+      e = new.env()
+      load(modfile,envir=e)
+      upmodel$model=e[["irt.model1"]]
+    }
+  })
+  
+  #start work
   revals=reactiveValues(optsel=NULL)
-  tempmirt1=reactive({get(input$sel1)})
-  coefs=reactive({coef(tempmirt1(),simplify=TRUE,IRTpars=TRUE)$items})
-  nites <- reactive({nrow(coefs())})
+  tempmirt1=reactive({
+    if(is.null(upmodel$model)){return(NULL)}
+    upmodel$model
+  })
+  
+  coefs=reactive({
+    if(is.null(tempmirt1())){return(NULL)}
+    coef(tempmirt1(),simplify=TRUE,IRTpars=TRUE)$items
+    })
+  nites <- reactive({
+    if(is.null(tempmirt1())){return(NULL)}
+    nrow(coefs())
+    })
   #thetas=reactive({tempmirt1()@Model$Theta})
-  thetas=reactive({tempmirt1()@Model$Theta
-    as.matrix(seq(-6,6,length=201))})
+  thetas=reactive({
+    #tempmirt1()@Model$Theta
+    as.matrix(seq(-6,6,length=201))
+    })
   
   observe({
     updateNumericInput(session,"thetamean","Mean"
-                       ,value=data.frame(coef(tempmirt1())$GroupPars)$MEAN_1[1])
+                       ,value=nulltozero(data.frame(coef(tempmirt1())$GroupPars)$MEAN_1[1]))
     updateNumericInput(session,"thetasd","SD"
-                        ,value=sqrt(data.frame(coef(tempmirt1())$GroupPars)$COV_11[1]))
+                        ,value=sqrt(nulltoone(data.frame(coef(tempmirt1())$GroupPars)$COV_11[1])))
   })
   
   #qwts=reactive({extract.mirt(tempmirt1(),"Prior")[[1]]})
@@ -266,6 +299,14 @@ server <- function(input, output,session) {
       temp1
       })
     output$idata1aopt=renderTable({idata1aopt()})
+    output$downloadSelection <- downloadHandler(
+      filename = function() {"SelectedItems.csv"},
+      content = function(file) {
+        write.csv(idata1aopt(), file, row.names = FALSE)
+      }
+    )
+    
+    
     output$idata1aoptsum=renderTable({
       temp1=NULL
       if(!is.null(revals$optsel)){
@@ -275,6 +316,7 @@ server <- function(input, output,session) {
       temp1})
 
   output$item_selections <- renderUI({
+    if(is.null(tempmirt1())){return(NULL)}
     buttons <- as.list(1:nites())
     buttons <- lapply(buttons, function(i){
       wellPanel(splitLayout(cellWidths = c("75%", "25%"),cellArgs = list(style = "padding: 1px")
@@ -301,6 +343,7 @@ server <- function(input, output,session) {
   })
   
   itesels=reactive({
+    if(is.null(tempmirt1())){return(NULL)}
     temp1=NULL
     for(iz in 1:nites()){temp1=c(temp1,input[[paste0("item_num",iz)]])}
     temp1
@@ -310,7 +353,10 @@ server <- function(input, output,session) {
   output$estclass=renderTable({estclass()})
   output$coefs=renderTable({coefs()},rownames = TRUE)
 
-  which.items=reactive({rep(1:nites(),times=itesels())})
+  which.items=reactive({
+    if(is.null(tempmirt1())){return(NULL)}
+    rep(1:nites(),times=itesels())
+    })
   output$which.items=renderText({which.items()})
   
   dist1=reactive({

@@ -1,22 +1,175 @@
-#version to work with models fitted using syntax
+#VERSION THAT ALLOWS INTERACTIVE DATA UPLOAD
+#MODEL FITTING AND SAVING
 
 #Global statements
 library(shiny)
 library(unimirt)
 library(ggplot2)
 library(reshape2)
-globls=ls(name=".GlobalEnv")
-#print(globls)
-classes=NULL
-for(i in 1:length(globls)){classes=c(classes,as.vector(paste(class(get(globls[i])),collapse="") ))}
-loadofmirts=ls(name=".GlobalEnv")[classes%in%c("SingleGroupClass")]
-print(loadofmirts)
 
 #MAIN WORK
 #MAIN WORK
 server <- function(input, output,session) {
 
-  tempmirt1=reactive({get(input$sel1)})
+  #INPUT AND MODEL FITTING
+  #INPUT AND MODEL FITTING
+  #INPUT AND MODEL FITTING
+  #INPUT AND MODEL FITTING
+  
+  #anchor stuff
+  ancmodel=reactiveValues(model=NULL)
+  observeEvent(input$anchormodel, {
+    modin=input$anchormodel
+    if(is.null(modin)){ancmodel$model=NULL}
+    if(!is.null(modin)){
+      modfile <- input$anchormodel$datapath
+      e = new.env()
+      load(modfile,envir=e)
+      ancmodel$model=e[["irt.model1"]]
+    }
+  })
+  
+  #ANCHOR basic information
+  output$anchoroverallinfo=renderTable({
+    if(is.null(ancmodel$model)){return(NULL)}
+    data.frame(N.persons=ancmodel$model@Data$N
+               ,N.items=ancmodel$model@Data$nitems
+               ,Fit.LogLikelihood=ancmodel$model@Fit$logLik
+               ,Fit.AIC=ancmodel$model@Fit$AIC
+               ,Fit.BIC=ancmodel$model@Fit$BIC)
+  })
+  output$anchoritemtypesinfo=renderTable({
+    if(is.null(ancmodel$model)){return(NULL)}
+    itypedat=data.frame(table(extract.mirt(ancmodel$model,"itemtype")))
+    names(itypedat)=c("item.type","Freq")
+    itypedat
+  })
+  
+  output$anchoritemmaxesinfo=renderTable({
+    if(is.null(ancmodel$model)){return(NULL)}
+    imaxdat=data.frame(table(extract.mirt(ancmodel$model,"K")-1))
+    names(imaxdat)=c("item.maximum","Freq")
+    imaxdat
+  })
+  
+
+  #main stuff
+  upmodel=reactiveValues(model=NULL)
+  observeEvent(input$existingmodel, {
+    modin=input$existingmodel
+    if(is.null(modin)){upmodel$model=NULL}
+    if(!is.null(modin)){
+      modfile <- input$existingmodel$datapath
+      e = new.env()
+      load(modfile,envir=e)
+      upmodel$model=e[["irt.model1"]]
+    }
+  })
+
+  filedata=reactiveValues(data=NULL)
+  infile=reactiveValues(datapath=NULL)
+  observeEvent(input$datafile, {infile$datapath <- input$datafile$datapath})
+  observeEvent({list(infile$datapath,upmodel$model)}, {
+    if (is.null(infile$datapath) & is.null(upmodel$model)) {
+      # User has not uploaded a file yet
+      filedata$data=NULL
+    }
+    if (!is.null(infile$datapath) & is.null(upmodel$model)) {
+      filedata$data=read.csv(infile$datapath)
+    }
+    if (!is.null(upmodel$model)) {
+      filedata$data=data.frame(upmodel$model@Data$data)
+    }
+  })
+  
+  output$text1 <- renderPrint({
+    tempmirt1()
+  })
+  
+  output$tt <- renderTable({
+    if(is.null(filedata$data)){return(NULL)}
+    head(filedata$data)
+  })
+
+  EstimatedOrOld=reactiveValues(choice = 1)
+  observeEvent(input$ready, {EstimatedOrOld$choice=1+runif(1,0.9,1.1)})
+  
+  observeEvent(input$reset, {
+    EstimatedOrOld$choice=1
+    infile$datapath=NULL
+    filedata$data=NULL
+    upmodel$model=NULL
+    ancmodel$model=NULL
+  })
+  
+  tempmirt1a=eventReactive(EstimatedOrOld$choice,{
+      mod3=NULL
+      withProgress(message = 'Fitting IRT model',value=0,{
+        if(!is.null(filedata$data)){
+          if(substr(input$dentype,1,3)=="Dav" & !input$modeltype=="Rasch"){
+            mod3=unimirt(filedata$data,input$modeltype
+                         ,SE=FALSE,dentype=input$dentype,anchor=ancmodel$model)
+            }
+          if(substr(input$dentype,1,3)=="Dav" & input$modeltype=="Rasch"){
+            mod3=unimirt(filedata$data,input$modeltype
+                         ,SE=FALSE,dentype="Gaussian",anchor=ancmodel$model)
+          }
+          if(substr(input$dentype,1,3)!="Dav"){
+            mod3=unimirt(filedata$data,input$modeltype
+                         ,SE=TRUE,dentype=input$dentype,anchor=ancmodel$model)
+            }
+        }
+      })
+      mod3
+  })
+  
+  tempmirt1=reactive({
+    mod1=upmodel$model
+    #if the button have ever been clicked then use this
+    if(EstimatedOrOld$choice>1){mod1=tempmirt1a()}
+    mod1
+  })
+
+  irt.model <- reactiveValues()
+  observe({
+    if(!is.null(tempmirt1()))
+      isolate(irt.model1 <<- tempmirt1())
+  })
+  output$downloadModel <- downloadHandler(
+    filename <- function(){
+      paste0(input$modelfilename,".RData")
+    },
+    content = function(file) {
+      save(irt.model1, file = file)
+    }
+  )
+  
+  #PERSON ABILITY STUFF
+  calcabils=eventReactive(input$calcabil,{
+    abils=NULL
+    withProgress(message = 'Calculating person abilities',value=0,{
+          resp.patterns=tempmirt1()@Data$data
+          if ("fakedata" %in% names(attributes(tempmirt1()))){
+            resp.patterns = resp.patterns[attr(tempmirt1(), "fakedata") == FALSE,]
+          }
+          abils=fscores(tempmirt1(),method=input$calcabiltype,response.pattern=resp.patterns)
+    })
+    abils
+  })
+  output$textheadabils <- renderPrint({
+    head(calcabils())
+  })
+  output$downloadAbils <- downloadHandler(
+    filename = function() {"PersonAbilities.csv"},
+    content = function(file) {
+      write.csv(calcabils(), file, row.names = FALSE)
+    }
+  )
+  
+  
+  ###STUFF AS FROM V2
+  ###STUFF AS FROM V2
+  ###STUFF AS FROM V2
   thetas=reactive({
     set.seed(293472397)
     #fs1=fscores(tempmirt1(),method="plausible"
@@ -38,18 +191,18 @@ server <- function(input, output,session) {
   
   fits=reactive({
     if(anymiss()==TRUE){
-      quickfits=itemfit(tempmirt1(),fit_stats=c("X2"),Theta=thetas(),mincell.X2=0)
+    quickfits=itemfit(tempmirt1(),fit_stats=c("X2"),Theta=thetas(),mincell.X2=0)
     }
     if(anymiss()==FALSE){
       quickfits=itemfit(tempmirt1(),fit_stats=c("X2","infit"),Theta=thetas(),mincell.X2=0)
     }
     quickfits
-  })
+    })
   
   output$plotsel <- renderUI({
     selectInput("plotsel","Choose item",colnames(tempmirt1()@Data$data))
   })
-  
+
   output$plotsel2 <- renderUI({
     selectInput("plotsel2","Choose item(s)",colnames(tempmirt1()@Data$data)
                 ,selected=colnames(tempmirt1()@Data$data)[1]
@@ -181,10 +334,10 @@ server <- function(input, output,session) {
   disttable$sd_theta=disttable$sdtheta
   disttable=disttable[,c("score","predicted_percent"
                          ,"predicted_cum_percent"
-                         ,"expected_theta","sd_theta","TCC_theta")]
-  })
+                          ,"expected_theta","sd_theta","TCC_theta")]
+    })
   output$totalscoredisttable=renderTable(totalscoredisttable())
-
+  
   output$downloadScoreDist <- downloadHandler(
     filename = function() {"TotalScoreDistribution.csv"},
     content = function(file) {
@@ -310,9 +463,74 @@ server <- function(input, output,session) {
 ###ACTUAL OUTPUT
 ui <- fluidPage(
   # Application title
-  titlePanel("Basic IRT results"),
-  selectInput("sel1", "Select an IRT object",loadofmirts),
+  titlePanel("Unidimensional IRT modelling"),
   navlistPanel(
+    tabPanel("Model fitting and restore",
+        tabsetPanel(tabPanel("Main data",
+             actionButton("reset","Clear loaded data sets/models from tool")
+             ,br(),br()
+             ,fluidRow("For new analyses, choose a file of data to which an IRT model will be fitted.
+                       The rows should relate to pupils and the columns
+                      to item scores. No extraneous information 
+                      (e.g. pupil IDs) should be included.")
+             ,fileInput('datafile', 'CSV file of item data',
+                        accept=c('text/csv'
+                                 , 'text/comma-separated-values,text/plain'))
+             ,fluidRow("As an alternative to uploading raw data, upload a file of a model you've already fitted.")
+             ,fileInput('existingmodel', '.RData file with existing model')
+             ,fluidRow("Below is a preview of the first few rows of your data set (if uploaded).")
+             ,tableOutput("tt")
+             ,br(),br()
+             ,fluidRow("If necessary (i.e. not already done), once the data is uploaded you can click the button below to estimate the IRT model. 
+                       This can also be used to amend an existing model.")
+             ,selectInput("modeltype","Type of IRT model to fit",
+                          c("2PL/Graded Response"="2"
+                            ,"3PL/Graded Response"="3"
+                            ,"Rasch/Partial Credit"="Rasch"
+                            ,"Generalised Partial Credit Model"="gpcm"
+                            ,"GPCM (equal slopes)"="gpcmfixed"
+                          ))
+             ,selectInput("dentype","Shape of ability distribution to fit (recommend sticking to 'Gaussian' unless good reason why not)",
+                          c("Normal"="Gaussian"
+                            ,"Empirical Histogram"="EH"
+                            ,"3 parameter Davidian curve (no SEs/Rasch)"="Davidian-3"
+                            ,"4 parameter Davidian curve (no SEs/Rasch)"="Davidian-4"
+                            ,"5 parameter Davidian curve (no SEs/Rasch)"="Davidian-5"
+                            ,"6 parameter Davidian curve (no SEs/Rasch)"="Davidian-6"
+                            ,"7 parameter Davidian curve (no SEs/Rasch)"="Davidian-7"
+                            ,"8 parameter Davidian curve (no SEs/Rasch)"="Davidian-8"
+                            ,"9 parameter Davidian curve (no SEs/Rasch)"="Davidian-9"
+                            ,"10 parameter Davidian curve (no SEs/Rasch)"="Davidian-10"
+                          ))
+             ,actionButton("ready","Ready to estimate models")
+             ,fluidRow("Messages from model fitting shown below.")
+             ,verbatimTextOutput("text1")
+             ,textInput("modelfilename", "Filename for saving fitted model")
+             ,downloadButton("downloadModel", "Download fitted model")
+    )
+    ,tabPanel("Anchor model (OPTIONAL)"
+              ,fluidRow("If you want some item parameters to be anchored to pre-existing values
+                        then upload a '.RData' file from a model you've estimated earlier.
+                        Common items will be automatically identified by item name
+                        and the parameter values will be anchored
+                        to the values you have already estimated.")
+              ,fileInput('anchormodel', '.RData file with existing model')
+              ,fluidRow("If you have uploaded an anchor model then information
+              about the numbers of persons and items 
+                        used to create that model is below alongside measures of model fit.
+                        The number of items with each maximum number of marks
+                        and with each estimated item type is also displayed.
+                        It is very important that the item types used in this model
+                        match the item types you use to fit any new model.")
+              ,br(),br()
+              ,tableOutput("anchoroverallinfo")
+              ,br(),br()
+              ,tableOutput("anchoritemtypesinfo")
+              ,br(),br()
+              ,tableOutput("anchoritemmaxesinfo")
+    )
+    ))
+    ,
     tabPanel("Basic Information",
              "Information about the numbers of persons and items 
              included in analysis is below alongside measures of model fit.
@@ -346,7 +564,7 @@ ui <- fluidPage(
                  each item to the model. Fit is calculated using a
                  chi-square test comparing how expected achievement
                  on each item given ability relates to actual achievement
-                 for groups of pupils with different levels of ability (estimated using plausible values)."
+                for groups of pupils with different levels of ability (estimated using plausible values)."
                  ,br(),br()
                  ,"Where a Rasch model has been fitted and data is available for all items
                  for all candidates, INFIT and OUTFIT statistics are also provided."
@@ -503,8 +721,8 @@ ui <- fluidPage(
                  to each total score on the test characteristic curve."
                  ,fluidRow(tableOutput("totalscoredisttable"))
                  ,downloadButton("downloadScoreDist", "Download")
-        )
-    ,
+                 )
+        ,
         tabPanel("Item score distributions"
                  ,fluidRow(uiOutput("plotsel4"))
                  ,"The chart and table show the expected score distribution for the selected item based upon the fitted model.
@@ -555,6 +773,22 @@ ui <- fluidPage(
              ,
              tableOutput("thurstthreshtable")
              ,downloadButton("downloadThurst", "Download"))
+    ,
+    tabPanel("Person estimates"
+             ,selectInput("calcabiltype","Type of ability estimate to use"
+                          ,c("Maximum Likelihood"="ML"
+                             ,"Weighted Likelihood (WLE)"="WLE"
+                             ,"Expected a-posteriori (EAP)"="EAP"
+                             ,"Maximum a-posteriori (MAP)"="MAP"))
+             ,"Click the button below to create a data set of ability estimates."
+             ,br(),br()
+             ,actionButton("calcabil","Click when ready to calculate ability estimates")
+             ,br(),br()
+             ,"Once ability estimates have been calculated, the first few rows are shown below"
+             ,verbatimTextOutput("textheadabils")
+             ,br(),br()
+             ,downloadButton("downloadAbils", "Download calculated person abilities (once calculated)")
+             )
     
   ,widths=c(3,9))
 )
