@@ -36,10 +36,10 @@ server <- function(input, output,session) {
   
   fits=reactive({
     
-    if(anymiss()==TRUE){
+    if(sum(is.na(tempmirt1()@Data$data))>0){
       quickfits=itemfit(tempmirt1(),fit_stats=c("X2"),Theta=thetas(),mincell.X2=0)
     }
-    if(anymiss()==FALSE){
+    if(sum(is.na(tempmirt1()@Data$data))==0){
       quickfits=itemfit(tempmirt1(),fit_stats=c("X2","infit"),Theta=thetas(),mincell.X2=0)
     }
     quickfits

@@ -61,8 +61,10 @@ if(is.null(which1) & is.null(which2)){
 if(length(which1)==0){print("No common items found in the items names. Please specify some common items manually.")
 	return(NULL)}
 
-maxes1=apply(mirtobj1@Data$data,2,max,na.rm=TRUE)
-maxes2=apply(mirtobj2@Data$data,2,max,na.rm=TRUE)
+#maxes1=apply(mirtobj1@Data$data,2,max,na.rm=TRUE)
+#maxes2=apply(mirtobj2@Data$data,2,max,na.rm=TRUE)
+maxes1=extract.mirt(mirtobj1,"K")-1
+maxes2=extract.mirt(mirtobj2,"K")-1
 thetas=mirtobj1@Model$Theta
 qwts=mirtobj1@Internals$Prior[[1]]
 expected1=mirt::expected.test(mirtobj1, thetas,which.items = which1)

@@ -40,17 +40,23 @@ ScoreDistFromMirt=
       thetas = as.matrix(thetas)
     }
     nqpts = dim(thetas)[1]
+
     coefs = coef(mirtobj, simplify = TRUE)$items
-    coefsd = coefs[, substr(colnames(coefs), 1, 1) == "d" & !colnames(coefs) == 
-                     "d0"]
-    if (!is.matrix(coefsd)) {
-      coefsd = as.matrix(coefsd)
-    }
     nites = dim(coefs)[1]
     if (is.null(which.items)) {
       which.items = 1:nites
     }
-    papermax = sum(!is.na(coefsd[which.items, ]))
+
+    #coefsd = coefs[, substr(colnames(coefs), 1, 1) == "d" & !colnames(coefs) == 
+    #                 "d0"]
+    #if (!is.matrix(coefsd)) {
+    #  coefsd = as.matrix(coefsd)
+    #}
+    #papermax = sum(!is.na(coefsd[which.items, ]))
+
+    maxes=extract.mirt(mirtobj,"K")-1
+    papermax=sum(maxes[which.items])
+
     paperps = matrix(rep(0, (papermax + 1) * nqpts), ncol = nqpts)
     paperps[1, ] = 1
     for (iiz in which.items) {
