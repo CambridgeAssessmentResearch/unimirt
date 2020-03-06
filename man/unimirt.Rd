@@ -4,8 +4,7 @@
 \alias{unimirt}
 \title{Wrapper for "mirt" to facilitate fitting unidimensional models of different types.}
 \usage{
-unimirt(data, short.type = "2", augment.data = TRUE, anchor = NULL,
-  ...)
+unimirt(data, short.type = "2", augment.data = TRUE, anchor = NULL, ...)
 }
 \arguments{
 \item{data}{A data frame of item data.}

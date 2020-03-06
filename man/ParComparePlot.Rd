@@ -4,8 +4,12 @@
 \alias{ParComparePlot}
 \title{Plot comparing item parameters}
 \usage{
-ParComparePlot(mirtobjlist, mirtnames = NULL, commononly = TRUE,
-  compare = "Difficulties")
+ParComparePlot(
+  mirtobjlist,
+  mirtnames = NULL,
+  commononly = TRUE,
+  compare = "Difficulties"
+)
 }
 \arguments{
 \item{mirtobjlist}{A list of estimated IRT models. For this function to make

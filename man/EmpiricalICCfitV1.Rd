@@ -31,7 +31,7 @@ NOTE: THIS IS A SIMPLIFIED VERSION OF THE FUNCTION FOR EmpiricalICCfit
 The empirical item characteristic curve plots the mean scores on each item for groups with different total scores
 on the whole test. If the total test scores include the item itself then technically this subroutine
 calculates the expected relationship against total scores on a parallel test so (for example) a raw total score of zero
-will not necessarily imply a definite score of zero on the item.
+will not necessarily imply a definite score of zero on the item. 
 
 Currently just used as a subroutine within the function EmpiricalICCfit
 }

@@ -9,7 +9,7 @@ runItemSelectionApp(interactive.upload = FALSE)
 \arguments{
 \item{interactive.upload}{If TRUE launch a version of the App that allows loading previously fitted IRT models interactively.
 Otherwise (default) the Shiny App is purely concerned with viewing results for IRT models
-that have already been fitted using R code}
+that have already been fitted using R code.}
 }
 \description{
 This function launches a shiny app where allowing item selection based upon information estimated using IRT and stored in "mirt" objects. Supplementary information may also be uploaded to the app to support item selection.

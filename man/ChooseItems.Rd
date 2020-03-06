@@ -4,8 +4,13 @@
 \alias{ChooseItems}
 \title{Select items to maximise the sum of sum particular variable whilst meeting other constraints}
 \usage{
-ChooseItems(idata, maxvar, constrvars = NULL, constrmins = NULL,
-  constrmaxs = NULL)
+ChooseItems(
+  idata,
+  maxvar,
+  constrvars = NULL,
+  constrmins = NULL,
+  constrmaxs = NULL
+)
 }
 \arguments{
 \item{idata}{A data frame containing information about all the items.}

@@ -4,8 +4,13 @@
 \alias{unimirt.plot}
 \title{IRT plots}
 \usage{
-unimirt.plot(mirtobj, type, which.items = NULL, thetamin = NULL,
-  thetamax = NULL)
+unimirt.plot(
+  mirtobj,
+  type,
+  which.items = NULL,
+  thetamin = NULL,
+  thetamax = NULL
+)
 }
 \arguments{
 \item{mirtobj}{An estimated IRT model (of class SingleGroupClass) estimated either using \link[mirt]{mirt} or \link[unimirt]{unimirt}.}

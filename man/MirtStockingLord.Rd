@@ -4,8 +4,13 @@
 \alias{MirtStockingLord}
 \title{Estimate Stocking-Lord transformation between two mirt objects and equate}
 \usage{
-MirtStockingLord(mirtobj1, mirtobj2, which1 = NULL, which2 = NULL,
-  fixSLA = FALSE)
+MirtStockingLord(
+  mirtobj1,
+  mirtobj2,
+  which1 = NULL,
+  which2 = NULL,
+  fixSLA = FALSE
+)
 }
 \arguments{
 \item{mirtobj1}{An object from  a fitted unidimensional IRT model using \link[mirt]{mirt} or \link[unimirt]{unimirt}. This will be for the test which equating is being done from (i.e. form X in equating terminology).}

@@ -4,8 +4,7 @@
 \alias{EstimatedItemDistribution}
 \title{Estimate the score distribution for an individual item in a "mirt" object.}
 \usage{
-EstimatedItemDistribution(mirtobj, which.item, theta = NULL,
-  qwts = NULL)
+EstimatedItemDistribution(mirtobj, which.item, theta = NULL, qwts = NULL)
 }
 \arguments{
 \item{mirtobj}{An estimated IRT model (of class SingleGroupClass) estimated either using \link[mirt]{mirt} or \link[unimirt]{unimirt}.}

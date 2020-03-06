@@ -4,7 +4,7 @@
 #' 
 #' @param interactive.upload If TRUE launch a version of the App that allows loading previously fitted IRT models interactively.
 #' Otherwise (default) the Shiny App is purely concerned with viewing results for IRT models
-#' that have already been fitted using R code
+#' that have already been fitted using R code.
 #' 
 #' @examples
 #' \dontrun{
