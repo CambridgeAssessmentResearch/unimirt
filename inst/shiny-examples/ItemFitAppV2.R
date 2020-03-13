@@ -105,6 +105,19 @@ server <- function(input, output,session) {
   plotcoef2=reactive({coefs()[plotselnum2(),]})
   output$plotcoeftable2<-renderTable({plotcoef2()},rownames=TRUE)
 
+  ###added to version 0.0.15
+  ###added to version 0.0.15
+  testcharacteristictable=reactive({itemplotdata(tempmirt1())$testdata})
+  output$testcharacterictable<-renderTable({testcharacteristictable()},rownames=FALSE)
+  output$testcharactericcurve<-renderPlot({unimirt.plot(tempmirt1(),"score")+ylim(0,max(dist1()$score))})
+  output$testinformationcurve<-renderPlot({unimirt.plot(tempmirt1(),"info")})
+  output$downloadTestChars <- downloadHandler(
+    filename = function() {"TestCharacTeristics.csv"},
+    content = function(file) {
+      write.csv(testcharacteristictable(), file, row.names = FALSE)
+    }
+  )
+  
   #Empirical ICC plots
   plotselnum3=reactive({(1:ncol(tempmirt1()@Data$data))[colnames(tempmirt1()@Data$data)==input$plotsel3]})
   
@@ -446,7 +459,25 @@ ui <- fluidPage(
                  ,downloadButton("downloadEstClass", "Download")
                  )
         ,
-        tabPanel("Ability distributions"
+    tabPanel("Test characteristics"
+             ,"The plot below shows the test characteristic curve.
+             This displays the expected score on the whole test
+             (i.e across ALL items in the analysis) for students at different levels of ability."
+             ,br(),br()
+             ,fluidRow(plotOutput("testcharactericcurve"))
+             ,br(),br()
+             ,"The next plot shows the test information function.
+             This is calculated as the sume of the item information functions across
+             ALL items in the analysis."
+             ,br(),br()
+             ,fluidRow(plotOutput("testinformationcurve"))
+             ,br(),br()
+             ,"The table below provides the same information as the above plots in tabular form."
+             ,tableOutput("testcharacterictable")
+             ,downloadButton("downloadTestChars", "Download")
+    )
+    ,
+    tabPanel("Ability distributions"
                  ,"The line shows the theoretical ability distribution.
                   The shaded area shows the distribution of estimated plausible ability values
                  for each pupil. Obvious discrepancies may indicate that
