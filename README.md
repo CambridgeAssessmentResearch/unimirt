@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/CambridgeAssessmentResearch/unimirt.svg?branch=master)](https://travis-ci.org/CambridgeAssessmentResearch/unimirt)
+
 # Applications of unidimensional IRT using the R package mirt
 
 Maintainer: Cambridge Assessment, Assessment, Research and Development (ARD) <benton.t@cambridgeassessment.org.uk>
