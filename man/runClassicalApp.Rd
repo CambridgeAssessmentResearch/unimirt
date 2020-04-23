@@ -20,7 +20,6 @@ It assumes that all pupils have had a chance to attempt all items.
 \dontrun{
 runClassicalApp()
 
-#To launch the version designed for multiple choice tests
-runClassicalApp(TRUE)
+runClassicalApp(MC=TRUE)
 }
 }

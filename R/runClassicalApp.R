@@ -12,8 +12,7 @@
 #' \dontrun{
 #' runClassicalApp()
 #' 
-#' #To launch the version designed for multiple choice tests
-#' runClassicalApp(TRUE)
+#' runClassicalApp(MC=TRUE)
 #' }
 #' @import shiny
 #' @export
