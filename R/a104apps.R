@@ -9,14 +9,13 @@
 #' @import shiny
 #' @export
 a104apps <- function() {
-
   choices=c("Classical Item Analysis"
             ,"Classical Equating"
             ,"IRT model fitting"
             ,"IRT model comparison and scaling"
             ,"IRT test construction")
   
-  choice=menu(choices,title="Enter a number corresponding to the App you want to launch.")
+  choice=utils::menu(choices,title="Enter a number corresponding to the App you want to launch.")
   if(choice==1){runClassicalApp()}
   if(choice==2){runClassicalEquatingApp()}
   if(choice==3){runResultsApp(TRUE)}
