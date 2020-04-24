@@ -1,6 +1,6 @@
 #' Pick an interative shiny app to launch
 #' 
-#' Running this function produces a simple menu. Enter the number corresponding to the intercative app you want to launch.
+#' Running this function produces a simple menu. Enter the number corresponding to the interactive app you want to launch.
 #' 
 #' @examples
 #' \dontrun{

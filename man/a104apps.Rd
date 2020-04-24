@@ -7,7 +7,7 @@
 a104apps()
 }
 \description{
-Running this function produces a simple menu. Enter the number corresponding to the intercative app you want to launch.
+Running this function produces a simple menu. Enter the number corresponding to the interactive app you want to launch.
 }
 \examples{
 \dontrun{
