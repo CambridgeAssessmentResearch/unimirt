@@ -145,7 +145,7 @@ inf2=function(theta){mirt::iteminfo(mirt::extract.item(mirtobj,ite),theta)}
 #first test all the usual values
 inf2a=inf2(thetas)
 inf2b=thetas[which.max(inf2a)]
-#use in general optimization
+#use general optimization
 opt1=stats::optim(inf2b,inf2,lower=range1[1],upper=range1[2]
 	,method="Brent",control=list(fnscale=-1))
 #if worse than initial search then search again close to initial value
