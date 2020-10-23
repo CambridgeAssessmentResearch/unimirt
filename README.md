@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/CambridgeAssessmentResearch/unimirt.svg?branch=master)](https://travis-ci.org/CambridgeAssessmentResearch/unimirt)
+[![Build Status](https://travis-ci.com/CambridgeAssessmentResearch/unimirt.svg?branch=master)](https://travis-ci.com/CambridgeAssessmentResearch/unimirt)
 
 # Applications of unidimensional IRT using the R package mirt
 
