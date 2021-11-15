@@ -4,7 +4,7 @@
 \alias{tam.jml.to.unimirt}
 \title{Convert IRT model fitted using tam.jml (from TAM package) to a mirt object}
 \usage{
-tam.jml.to.unimirt(tamjml)
+tam.jml.to.unimirt(tamjml = NULL)
 }
 \arguments{
 \item{tamjml}{.}
