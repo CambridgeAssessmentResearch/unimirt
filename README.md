@@ -17,7 +17,7 @@ Much of the functionality in this package is built upon the existing R package *
 **References**
 
 Chalmers, R.P. (2012). mirt: A Multidimensional Item Response Theory Package for the R Environment. 
-*Journal of Statistical Software, 48*(6), 1-29.
+*Journal of Statistical Software, 48*(6), 1-29 .
 
 ## Installation
 This package can be installed using the devtools package using the commands below.
@@ -26,7 +26,7 @@ This package can be installed using the devtools package using the commands belo
 
 library(devtools)
 
-
+Sys.setenv("R_REMOTES_NO_ERRORS_FROM_WARNINGS"=TRUE)
 
 install_github("CambridgeAssessmentResearch/unimirt")
 
