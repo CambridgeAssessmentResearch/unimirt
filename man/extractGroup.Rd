@@ -9,7 +9,9 @@ extractGroup(multgroupobj, group)
 \arguments{
 \item{multgroupobj}{An object of returned from \link[mirt]{multipleGroup}.}
 
-\item{group}{a number signifying which group should be extracted.}
+\item{group}{A character string specifying the name of the group to be
+extracted (e.g., "group1"), or a numeric value specifying the index of the
+group to be extracted (i.e., 1 will extract the first group in the object).}
 }
 \description{
 This is function is essentially a wrapper for the function \link[mirt]{extract.group} from the mirt package but
@@ -20,10 +22,15 @@ but we wish to be able to interactively view the results within particular group
 }
 \examples{
 \dontrun{
-groups=c(rep("1",200),rep("2",200))
+groups=c(rep("grp1",200),rep("grp2",200))
 mg1=multipleGroup(mathsdata[1:400,1:10],1,groups)
-mirt1=extractGroup(mg1,1)
+
+# Extract group 1 using character string naming group
+mirt1=extractGroup(mg1,"grp1")
+
+# Extract group 2 using numeric index
 mirt2=extractGroup(mg1,2)
+
 runResultsApp()
 }
 }
