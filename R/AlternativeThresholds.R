@@ -159,7 +159,7 @@ opt1$par
 #identify which rows needs search for theta that maximises information
 #(i.e. not equal to existing parameter)
 whichdifs=(1:nitems)
-notdifs=(1:nitems)[(maxes==1 & itypes%in%c("Rasch","gpcm","2PL","3PL","graded"))]
+notdifs=(1:nitems)[(maxes==1 & itypes%in%c("Rasch","gpcm","2PL","graded"))]
 if(length(notdifs)>0){whichdifs=(1:nitems)[-notdifs]}
 
 infdifs[whichdifs]=unlist(sapply(which.items[whichdifs],maxinffunc))
