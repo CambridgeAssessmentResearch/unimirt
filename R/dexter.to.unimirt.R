@@ -26,7 +26,7 @@ dexter.to.unimirt <- function (dexter.obj=NULL, dexter.dat=NULL)
   }
   
   # if data supplied as dexter database, convert to response matrix
-  if(class(dexter.dat)=="SQLiteConnection"){
+  if ("SQLiteConnection"%in%class(dexter.dat)) {
     dexter.dat <- dexter::get_resp_matrix(dexter.dat)
   }
   
