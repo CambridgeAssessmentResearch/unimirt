@@ -129,6 +129,9 @@ return(list(itemdata=itemdata,testdata=testdata,tracedata=tracedata))
 #' @export
 unimirt.plot=function(mirtobj,type,which.items=NULL,thetamin=NULL,thetamax=NULL){
 
+nitems=extract.mirt(mirtobj,"nitems")
+if(is.null(which.items)){which.items=1:nitems}
+
 if(!(type %in% c("trace","cumtrace","infotrace","itemscore","info","SE","score"))){
 	stop('type supplied is not supported')
 	}
