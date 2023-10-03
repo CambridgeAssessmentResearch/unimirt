@@ -243,9 +243,9 @@ server <- function(input, output,session) {
     max1=sum(ild()$Max.mark)
     distdata1=data.frame(Score=0:max1,
                         N=tabulate(tots+1,max1+1))
-    distdata1$Per_cent=floor(1000*distdata1$N/sum(distdata1$N)+0.5)/10
-    distdata1$Cum_per_cent=floor(1000*sapply(distdata1$Score
-                                 ,function(i){0+mean(tots>=i)})+0.5)/10
+    distdata1$Per_cent=floor(10000*distdata1$N/sum(distdata1$N)+0.5)/100
+    distdata1$Cum_per_cent=floor(10000*sapply(distdata1$Score
+                                 ,function(i){0+mean(tots>=i)})+0.5)/100
     distdata1
 
       })
