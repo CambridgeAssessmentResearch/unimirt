@@ -26,26 +26,24 @@
 #' MirtTidyCoef(mirt2)
 #' }
 #' @export
-MirtSubset=function(mirtobj,which.items){
-
-dat1=data.frame(mirtobj@Data$data[,which.items])
-names(dat1)=colnames(mirtobj@Data$data)[which.items]
-
-names1=colnames(dat1)
-itetypes=extract.mirt(mirtobj,"itemtype")[which.items]
-
-nextmirt2v=mirt(dat1,1,pars="values",itemtype=itetypes,technical=list(removeEmptyRows=TRUE))
-rowids=paste(nextmirt2v$item,"_",nextmirt2v$name,sep="")
-
-pars1=mod2values(mirtobj)
-rowids1=paste(pars1$item,"_",pars1$name,sep="")
-
-for(rowid in rowids){if(rowid%in%rowids1){
-  nextmirt2v$value[rowids==rowid]=pars1$value[rowids1==rowid]
-}}
-
-#nextmirt2v$est=FALSE
-nextmirt2=mirt(dat1,1,pars=nextmirt2v,itemtype=itetypes,TOL = NaN,technical=list(removeEmptyRows=TRUE))
-
-return(nextmirt2)
+MirtSubset=function (mirtobj, which.items) {
+    dat1 = data.frame(mirtobj@Data$data[, which.items])
+    #remove any rows from data that are now completely blank
+    dat1=dat1[!is.na(rowSums(dat1,na.rm=TRUE)),]
+    names(dat1) = colnames(mirtobj@Data$data)[which.items]
+    names1 = colnames(dat1)
+    itetypes = extract.mirt(mirtobj, "itemtype")[which.items]
+    nextmirt2v = mirt(dat1, 1, pars = "values", itemtype = itetypes)
+    rowids = paste(nextmirt2v$item, "_", nextmirt2v$name, sep = "")
+    pars1 = mod2values(mirtobj)
+    rowids1 = paste(pars1$item, "_", pars1$name, sep = "")
+    for (rowid in rowids) {
+        if (rowid %in% rowids1) {
+            nextmirt2v$value[rowids == rowid] = pars1$value[rowids1 == 
+                rowid]
+        }
+    }
+    nextmirt2 = mirt(dat1, 1, pars = nextmirt2v, itemtype = itetypes, TOL = NaN)
+    return(nextmirt2)
 }
+
