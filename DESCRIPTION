@@ -1,6 +1,6 @@
 Package: unimirt
 Title: Applications of Unidimensional IRT using the R Package 'mirt'
-Version: 1.0.6
+Version: 1.0.7
 Authors@R: person("Tom", "Benton", email = "benton.t@cambridgeassessment.org.uk", role = c("aut", "cre"))
 Description: Simplify the process of fitting unidimensional models using the R package 'mirt'. The package also includes shiny add-ons to help with viewing the results of IRT analyses as well an app that facilitates item selection based upon IRT results. Finally, it includes functions to make IRT linking of data sets that have been calibrated separately as easy as possible.
 Depends: R (>= 3.2.2), mirt, shiny, ggplot2
