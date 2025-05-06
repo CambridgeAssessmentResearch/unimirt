@@ -118,7 +118,7 @@ x2=c(-0.5,0.5+dist2$score)
 p2=c(0,cumsum(dist2$prob))
 p1=cumsum(dist1$prob)
 p1=0.5*(p1+c(0,p1[1:length(p1)-1]))
-obseq2=stats::approx(p2,x2,p1)$y
+obseq2=stats::approx(p2,x2,p1,rule=2)$y
 obseq2
 
 #check using the equate package

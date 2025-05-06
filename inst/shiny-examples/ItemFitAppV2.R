@@ -172,7 +172,7 @@ server <- function(input, output,session) {
   output$totalscoredistplot<-renderPlot({
       ggdist1=ggplot(data=dist1(),aes(x=score,y=prob))+
     #    geom_bar(stat="identity")+labs(x="raw.score",y="proportion")
-    geom_line(col="blue",size=1.2)+labs(x="raw.score",y="proportion")
+    geom_line(col="blue",linewidth=1.2)+labs(x="raw.score",y="proportion")
   if(anymiss()==FALSE){
     empiricaldist=data.frame(score=dist1()$score
                              ,prob=tabulate(1+rowSums(GetDataFromMirt(tempmirt1()))
