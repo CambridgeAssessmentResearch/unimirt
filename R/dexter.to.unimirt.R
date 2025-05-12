@@ -21,8 +21,8 @@
 dexter.to.unimirt <- function (dexter.obj=NULL, dexter.dat=NULL) 
 {
   # general catch for misspecified argument
-  if(is.null(dexter.obj)||!"prms" %in% class(dexter.obj)){
-    stop("An object of class prms must be provided")
+  if(is.null(dexter.obj)||!("enorm" %in% class(dexter.obj)|"prms" %in% class(dexter.obj))){
+    stop("An object of class enorm or prms must be provided")
   }
   
   # if data supplied as dexter database, convert to response matrix
