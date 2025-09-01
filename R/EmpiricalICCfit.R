@@ -117,8 +117,8 @@ EmpiricalICCfit=function(mirtobj,itenum,which.items=NULL,ngroups=1){
                                ,N=table(scoregroups)
   )
   
-  plot1=ggplot(data=modelchartdat,aes_string(x="raw.score",y="item.score"))+geom_line()+
-    geom_point(data=empiricalchartdat,alpha=0.5,aes_string(size="N.Freq"))+
+  plot1=ggplot(data=modelchartdat,aes(x=.data[["raw.score"]],y=.data[["item.score"]]))+geom_line()+
+    geom_point(data=empiricalchartdat,alpha=0.5,aes(size=.data[["N.Freq"]]))+
     scale_size_area()+ylim(0,imax)+xlim(0,totmax)
 
   return(list(plot1=plot1,modelchartdat=modelchartdat,empiricalchartdat=empiricalchartdat))
@@ -226,8 +226,8 @@ EmpiricalICCfitV1=function(mirtobj,itenum,which.items=NULL,ngroups=1){
   
   maxes=extract.mirt(mirtobj,"K")-1
 
-  plot1=ggplot(data=modelchartdat,aes_string(x="raw.score",y="item.score"))+geom_line()+
-    geom_point(data=empiricalchartdat,alpha=0.5,aes_string(size="N.Freq"))+
+  plot1=ggplot(data=modelchartdat,aes(x=.data[["raw.score"]],y=.data[["item.score"]]))+geom_line()+
+    geom_point(data=empiricalchartdat,alpha=0.5,aes(size=.data[["N.Freq"]]))+
     scale_size_area()+ylim(0,maxes[itenum])
 
   return(list(plot1=plot1,modelchartdat=modelchartdat,empiricalchartdat=empiricalchartdat))

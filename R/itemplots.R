@@ -145,39 +145,39 @@ plotdat=itemplotdata(mirtobj,which.items=which.items,Theta=theta)
 #trace
 if(type=="trace"){
 ggp=ggplot(data=plotdat$tracedata
-	,aes_string(x="theta",y="category.prob",col="item.name",lty="category"))+geom_line()+ylim(0,1)
+	,aes(x=.data[["theta"]],y=.data[["category.prob"]],col=.data[["item.name"]],lty=.data[["category"]]))+geom_line()+ylim(0,1)
 }
 
 #cumulative trace
 if(type=="cumtrace"){
   ggp=ggplot(data=plotdat$tracedata[!plotdat$tracedata$category=="0",]
-            ,aes_string(x="theta",y="cum.prob",col="item.name",lty="category"))+geom_line()+ylim(0,1)
+            ,aes(x=.data[["theta"]],y=.data[["cum.prob"]],col=.data[["item.name"]],lty=.data[["category"]]))+geom_line()+ylim(0,1)
 }
 
 #infotrace
 if(type=="infotrace"){
 ggp=ggplot(data=plotdat$itemdata
-           ,aes_string(x="theta",y="item.information",col="item.name"))+geom_line()+ylim(0,NA)
+           ,aes(x=.data[["theta"]],y=.data[["item.information"]],col=.data[["item.name"]]))+geom_line()+ylim(0,NA)
 }
 
 #itemscore
 if(type=="itemscore"){
 ggp=ggplot(data=plotdat$itemdata
-           ,aes_string(x="theta",y="item.score",col="item.name"))+
+           ,aes(x=.data[["theta"]],y=.data[["item.score"]],col=.data[["item.name"]]))+
   geom_line()+ylim(0,ceiling(max(plotdat$itemdata$item.score)))
 }
 
 #info
 if(type=="info"){
 ggp=ggplot(data=plotdat$testdata
-           ,aes_string(x="theta",y="test.information"))+
+           ,aes(x=.data[["theta"]],y=.data[["test.information"]]))+
 	geom_line()+ylim(0,NA)
 }
 
 #SE
 if(type=="SE"){
 ggp=ggplot(data=plotdat$testdata
-           ,aes_string(x="theta",y="test.se.theta"))+
+           ,aes(x=.data[["theta"]],y=.data[["test.se.theta"]]))+
   geom_line()+ylim(0,NA)
 }
 
@@ -186,7 +186,7 @@ if(type=="score"){
 maxes=extract.mirt(mirtobj,"K")-1
 testmax=sum(maxes[which.items])
 ggp=ggplot(data=plotdat$testdata
-           ,aes_string(x="theta",y="test.score"))+geom_line()+ylim(0,testmax)
+           ,aes(x=.data[["theta"]],y=.data[["test.score"]]))+geom_line()+ylim(0,testmax)
 }
 
 return(ggp)

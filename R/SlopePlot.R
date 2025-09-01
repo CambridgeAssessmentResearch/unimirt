@@ -36,14 +36,14 @@ if(!is.null(which.items)){tidy=tidy[which.items,]}
 tidy$itenum=1:nrow(tidy)
 
 gg1=ggplot(data=tidy
-           ,aes_string(x="itenum",y="a",label="Item"))+
-  geom_text(aes_string(col="nmarks"))
+           ,aes(x=.data[["itenum"]],y=.data[["a"]],label=.data[["Item"]]))+
+  geom_text(aes(col=.data[["nmarks"]]))
 gg1=gg1+geom_hline(yintercept=medianslope,lty=2)
 gg1=gg1+scale_x_continuous(trans="reverse",breaks = tidy$itenum,  labels = tidy$Item)
 gg1=gg1+labs(x=NULL,y="IRT Slope",col="Item Maximum")
 
 if("a.SE"%in%names(tidy)){
-  gg1=gg1+geom_errorbar(aes_string(ymax="ahigh",ymin="alow"),alpha=0.5)
+  gg1=gg1+geom_errorbar(aes(ymax=.data[["ahigh"]],ymin=.data[["alow"]]),alpha=0.5)
 }
 
 gg1=gg1+coord_flip()+theme_minimal()
@@ -111,16 +111,17 @@ DifficultyPlot=function(mirtobj,which.items=NULL){
   mediandiff=stats::median(tb$b)
   if(!is.null(which.items)){tb=tb[tb$itenum%in%which.items,]}
   tb$itenum=as.numeric(as.factor(tb$itenum))
+  tb$mark=as.factor(tb$mark)
   breaksdat=unique(tb[,c("itenum","OrigItem")])
     
-  gg1=ggplot(data=tb,aes_string(x="itenum",y="b",label="Item"))+
-    geom_text(aes_string(col="as.factor(mark)"))
+  gg1=ggplot(data=tb,aes(x=.data[["itenum"]],y=.data[["b"]],label=.data[["Item"]]))+
+    geom_text(aes(col=.data[["mark"]]))
   gg1=gg1+geom_hline(yintercept=mediandiff,lty=2)
   gg1=gg1+scale_x_continuous(trans="reverse",breaks = breaksdat$itenum,  labels = breaksdat$OrigItem)
   gg1=gg1+labs(x=NULL,y="IRT Difficulty",col="Mark")
   
   if("a.SE"%in%names(tidy)){
-    gg1=gg1+geom_errorbar(aes_string(ymax="bhigh",ymin="blow"),alpha=0.5)
+    gg1=gg1+geom_errorbar(aes(ymax=.data[["bhigh"]],ymin=.data[["blow"]]),alpha=0.5)
   }
   
   gg1=gg1+coord_flip()+theme_minimal()

@@ -67,11 +67,11 @@ ites=ites[length(ites):1]
 tidy1$Item=factor(tidy1$Item,levels=ites)
 
 if(compare=="Slopes"){
-gg1=ggplot(data=tidy1,aes_string(x="Item",y="a",label="Item",col="object"))+geom_text(position=position_dodge(width=1))
+gg1=ggplot(data=tidy1,aes(x=.data[["Item"]],y=.data[["a"]],label=.data[["Item"]],col=.data[["object"]]))+geom_text(position=position_dodge(width=1))
 gg1=gg1+labs(x=NULL,y="IRT Slope",col="Object")
 
 if("a.SE"%in%names(tidy)){
-  gg1=gg1+geom_errorbar(aes_string(ymax="ahigh",ymin="alow"),alpha=0.5,position=position_dodge(width=1))
+  gg1=gg1+geom_errorbar(aes(ymax=.data[["ahigh"]],ymin=.data[["alow"]]),alpha=0.5,position=position_dodge(width=1))
 }
 
 gg1=gg1+coord_flip()+theme_minimal()
@@ -79,11 +79,11 @@ return(gg1)
 }
 
 if(compare=="Guessing"){
-gg1=ggplot(data=tidy1,aes_string(x="Item",y="g",label="Item",col="object"))+geom_text(position=position_dodge(width=1))
+gg1=ggplot(data=tidy1,aes(x=.data[["Item"]],y=.data[["g"]],label=.data[["Item"]],col=.data[["object"]]))+geom_text(position=position_dodge(width=1))
 gg1=gg1+labs(x=NULL,y="IRT guessing parameter",col="Object")
 
 if("g.SE"%in%names(tidy)){
-  gg1=gg1+geom_errorbar(aes_string(ymax="ghigh",ymin="glow"),alpha=0.5,position=position_dodge(width=1))
+  gg1=gg1+geom_errorbar(aes(ymax=.data[["ghigh"]],ymin=.data[["glow"]]),alpha=0.5,position=position_dodge(width=1))
 }
 
 gg1=gg1+coord_flip()+theme_minimal()
@@ -118,11 +118,11 @@ ites=unique(tb$Item)
 ites=ites[length(ites):1]
 tb$Item=factor(tb$Item,levels=ites)
 
-gg1=ggplot(data=tb,aes_string(x="Item",y="b",label="Item",col="object"))+geom_text(position=position_dodge(width=1))
+gg1=ggplot(data=tb,aes(x=.data[["Item"]],y=.data[["b"]],label=.data[["Item"]],col=.data[["object"]]))+geom_text(position=position_dodge(width=1))
 gg1=gg1+labs(x=NULL,y="IRT Difficulty",col="Object")
 
 if("b.SE"%in%names(tb)){
-  gg1=gg1+geom_errorbar(aes_string(ymax="bhigh",ymin="blow"),alpha=0.5,position=position_dodge(width=1))
+  gg1=gg1+geom_errorbar(aes(ymax=.data[["bhigh"]],ymin=.data[["blow"]]),alpha=0.5,position=position_dodge(width=1))
 }
 
 gg1=gg1+coord_flip()+theme_minimal()

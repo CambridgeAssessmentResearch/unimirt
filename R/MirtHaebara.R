@@ -76,14 +76,14 @@ maxes2=extract.mirt(mirtobj2,"K")-1
 thetas=mirtobj1@Model$Theta
 qwts=as.numeric(mirtobj1@Internals$Prior[[1]])
 #expected item scores on all common items in a big list
-expected1=itemplotdata(mirtobj1,Theta=thetas,which=which1)$itemdata$item.score
+expected1=itemplotdata(mirtobj1,Theta=thetas,which.items=which1)$itemdata$item.score
 #need to apply weights across all items
 qwts=rep(qwts,length(which1))
 
 if(fixSLA==FALSE){
 #weighted difference between curves for given linear transformation of ability
 HaebaraFunc=function(ABvec){
-	sum(qwts*(itemplotdata(mirtobj2,Theta=ABvec[1]*thetas+ABvec[2],which = which2)$itemdata$item.score-expected1)^2)}
+	sum(qwts*(itemplotdata(mirtobj2,Theta=ABvec[1]*thetas+ABvec[2],which.items = which2)$itemdata$item.score-expected1)^2)}
 #HaebaraFunc(c(1,0))
 Hopt=stats::optim(c(1,0),HaebaraFunc)
 HaebaraA=Hopt$par[1]
@@ -94,7 +94,7 @@ HaebaraB=Hopt$par[2]
 if(fixSLA==TRUE){
   #weighted difference between curves for given linear transformation of ability
   HaebaraFuncB=function(B){
-	sum(qwts*(itemplotdata(mirtobj2,Theta=thetas+B,which = which2)$itemdata$item.score-expected1)^2)}
+	sum(qwts*(itemplotdata(mirtobj2,Theta=thetas+B,which.items = which2)$itemdata$item.score-expected1)^2)}
   Hopt=stats::optim(0,HaebaraFuncB,method="Brent",lower=-100,upper=100)
   HaebaraA=1
   HaebaraB=Hopt$par[1]
